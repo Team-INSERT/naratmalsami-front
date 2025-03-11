@@ -12,7 +12,7 @@ export default function NewFile() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include"
+        credentials: "include",
       });
       const data = await response.json();
       console.log(data.hashed_id);
@@ -73,6 +73,7 @@ const ButtonBase = styled.button`
   font-weight: 400;
   line-height: normal;
   border-radius: 34px;
+  user-select: none;
 `;
 
 const NewFileButton = styled(ButtonBase)`

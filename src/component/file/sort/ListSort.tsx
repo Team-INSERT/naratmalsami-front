@@ -11,7 +11,13 @@ export default function ListSort() {
       {Array.isArray(files) &&
         files.map((file) => (
           <ListFile key={file.hashed_id}>
-            <img src={word} alt="word" width={37} height={60} />
+            <img
+              src={word}
+              alt="word"
+              width={37}
+              height={60}
+              style={{ userSelect: "none" }}
+            />
             <FileNameDate>
               <FileName>{file.title}</FileName>
               <FileDate>
