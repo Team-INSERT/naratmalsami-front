@@ -13,7 +13,7 @@ export default function IconSort() {
 
   return (
     <IconSortBox>
-      {files.slice(0, 8).map((file) => (
+      {files.slice(0, 14).map((file) => (
         <IconFile
           key={file.hashed_id}
           onClick={() => navigate(`/files/${file.hashed_id}`)}
