@@ -1,22 +1,26 @@
 import React from "react";
 import styled from "styled-components";
 import word from "/public/images/icon/word.svg";
+import { useFileStore } from "@/shared/stores/useDocument";
 
 export default function ListSort() {
+  const files = useFileStore((state) => state.files);
+
   return (
-    <>
-      <ListSortBox>
-        {Array.from({ length: 7 }).map((_, index) => (
-          <ListFile>
+    <ListSortBox>
+      {Array.isArray(files) &&
+        files.map((file) => (
+          <ListFile key={file.hashed_id}>
             <img src={word} alt="word" width={37} height={60} />
             <FileNameDate>
-              <FileName>FileNameFileName...</FileName>
-              <FIleDate>2025-01-01</FIleDate>
+              <FileName>{file.title}</FileName>
+              <FileDate>
+                {new Date(file.updated_at).toLocaleDateString()}
+              </FileDate>
             </FileNameDate>
           </ListFile>
         ))}
-      </ListSortBox>
-    </>
+    </ListSortBox>
   );
 }
 
@@ -57,7 +61,7 @@ const FileName = styled.span`
   line-height: normal;
 `;
 
-const FIleDate = styled.span`
+const FileDate = styled.span`
   color: #afb1c3;
   font-family: Pretendard;
   font-size: 14px;

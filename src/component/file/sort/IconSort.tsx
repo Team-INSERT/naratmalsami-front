@@ -1,21 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { useFileStore } from "@/shared/stores/useDocument";
 
 export default function IconSort() {
+  const files = useFileStore((state) => state.files);
+  const fetchFiles = useFileStore((state) => state.fetchFiles);
+
+  useEffect(() => {
+    fetchFiles();
+  }, [fetchFiles]);
+
   return (
-    <>
-      <IconSortBox>
-        {Array.from({ length: 10 }).map((_, index) => (
-          <IconFile key={index}>
+    <IconSortBox>
+      {Array.isArray(files) &&
+        files.map((file) => (
+          <IconFile key={file.hashed_id}>
             <File />
             <FileNameDate>
-              <FileName>FileNameFileName...</FileName>
-              <FileDate>2025-01-01</FileDate>
+              <FileName>{file.title}</FileName>
+              <FileDate>
+                {new Date(file.updated_at).toLocaleDateString()}
+              </FileDate>
             </FileNameDate>
           </IconFile>
         ))}
-      </IconSortBox>
-    </>
+    </IconSortBox>
   );
 }
 
