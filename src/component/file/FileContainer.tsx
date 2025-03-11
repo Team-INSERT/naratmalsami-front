@@ -17,13 +17,13 @@ export default function FileContainer() {
             src={ListSortImage}
             alt="list"
             onClick={() => setIsIconSort(false)}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", userSelect: "none" }}
           />
           <img
             src={IconSortImage}
             alt="icon"
             onClick={() => setIsIconSort(true)}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", userSelect: "none" }}
           />
         </ListOrIcon>
       </LatestSortBox>
@@ -46,6 +46,7 @@ const Latest = styled.span`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  user-select: none;
 `;
 
 const ListOrIcon = styled.div`
