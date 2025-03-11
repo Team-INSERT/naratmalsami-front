@@ -1,12 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-<<<<<<< HEAD:src/pages/file/index.tsx
-import FileContainer from "@/shared/components/file/FileContainer";
-import NewFile from "@/shared/components/file/NewFile";
-=======
 import FileContainer from "@/component/file/FileContainer";
 import NewFile from "@/component/file/NewFile";
->>>>>>> aec616f (chore: file과 write 폴더 구조 변경):src/pages/write/file/index.tsx
 
 export default function FilePage() {
   return (
