@@ -1,29 +1,32 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useFileStore } from "@/shared/stores/useDocument";
+import { useNavigate } from "react-router-dom";
 
 export default function IconSort() {
-  const files = useFileStore((state) => state.files);
-  const fetchFiles = useFileStore((state) => state.fetchFiles);
+  const { files, fetchFiles } = useFileStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchFiles();
-  }, [fetchFiles]);
+  }, []);
 
   return (
     <IconSortBox>
-      {Array.isArray(files) &&
-        files.map((file) => (
-          <IconFile key={file.hashed_id}>
-            <File />
-            <FileNameDate>
-              <FileName>{file.title}</FileName>
-              <FileDate>
-                {new Date(file.updated_at).toLocaleDateString()}
-              </FileDate>
-            </FileNameDate>
-          </IconFile>
-        ))}
+      {files.slice(0, 8).map((file) => (
+        <IconFile
+          key={file.hashed_id}
+          onClick={() => navigate(`/files/${file.hashed_id}`)}
+        >
+          <File />
+          <FileNameDate>
+            <FileName>{file.title}</FileName>
+            <FileDate>
+              {new Date(file.updated_at).toLocaleDateString()}
+            </FileDate>
+          </FileNameDate>
+        </IconFile>
+      ))}
     </IconSortBox>
   );
 }
@@ -31,6 +34,7 @@ export default function IconSort() {
 const IconSortBox = styled.div`
   display: flex;
   width: 100%;
+
   align-items: center;
   align-content: center;
   gap: 24px 24.5px;
@@ -39,12 +43,13 @@ const IconSortBox = styled.div`
 
 const IconFile = styled.div`
   display: flex;
-  max-width: 9.1875rem;
+  min-width: 9.1875rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  cursor: pointer;
 `;
 
 const File = styled.div`
