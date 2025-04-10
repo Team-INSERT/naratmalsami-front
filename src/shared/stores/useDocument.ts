@@ -3,6 +3,7 @@ import deepDiff, { diff } from "deep-diff";
 import { parseHtmlToArray } from "@/utils/parseHtmlToArray";
 import generateUniqueId from "@/utils/generateUniqueId";
 import replaceSubstring from "@/utils/replaceSubstring";
+import { refineForeign } from "@/utils/ai/refineForeign";
 
 interface ErrorDetail {
   code: number;
@@ -147,6 +148,15 @@ export class DocumentProcessor {
       ? this.fetchAiRefinementsMock(modifiedElements)
       : this.fetchAiRefinements(modifiedElements);
   }
+  public async *fetchAiRefinementsLocal(modifiedElements: string[]): AsyncGenerator<ErrorData> {
+    const generator = refineForeign(modifiedElements);
+
+    for await (const element of generator) {
+      console.log(element);
+
+      yield element;
+    }
+  }
   private async fetchAiRefinements(modifiedElements: string[]): Promise<ErrorData[]> {
     const response = await fetch(`${import.meta.env.VITE_AI_API_URL}/ai/refine`, {
       method: "POST",
@@ -220,23 +230,26 @@ export const useDocument = create<RefineState>((set) => {
         );
 
         // Process the document and update state
-        documentProcessor
-          .getAiRefinements(modifiedElements)
-          .then(async (data) => {
-            // Update UI with results
-            state.appendErrors(data);
-            const processedDocument = await ErrorToBinding(data);
-            editorRef.current.setData(
-              processedDocument.querySelector(".ck-content")?.innerHTML as string
-            );
+        const processRefinements = async () => {
+          for await (const data of documentProcessor.fetchAiRefinementsLocal(modifiedElements)) {
+            try {
+              // Update UI with results
+              state.appendErrors([data]);
+              const processedDocument = await ErrorToBinding([data]);
+              editorRef.current.setData(
+                processedDocument.querySelector(".ck-content")?.innerHTML as string
+              );
 
-            // Update the state with the new document
-            set({ preDocument: newDocument, onProcessing: false });
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            set({ onProcessing: false });
-          });
+              // Update the state with the new document
+              set({ preDocument: newDocument, onProcessing: false });
+            } catch (e) {
+              console.error("Error:", e);
+              set({ onProcessing: false });
+            }
+          }
+        };
+
+        processRefinements();
 
         return { ...state, preDocument: newDocument };
       }),
