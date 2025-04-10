@@ -21,7 +21,13 @@
     "react-router-dom": "^7.2.0",
     "styled-components": "^6.1.15",
     "tiny-timer": "^1.6.0",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.22.0",
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
+    "hangul-js": "^0.2.6",
+    "mecab-ya": "^0.1.1"
   },
   "devDependencies": {
     "@ckeditor/ckeditor5-inspector": "^4.1.0",
