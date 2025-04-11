@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import deepDiff, { diff } from "deep-diff";
+import deepDiff from "deep-diff";
 import { parseHtmlToArray } from "@/utils/parseHtmlToArray";
 import generateUniqueId from "@/utils/generateUniqueId";
 import replaceSubstring from "@/utils/replaceSubstring";
@@ -82,6 +82,12 @@ const allowedHtmlTags = [
 ];
 
 export class DocumentProcessor {
+  static prepareDiff(preDocument: string[]): string[] {
+    return preDocument.map((element) => {
+      // HTML 태그를 제거하고
+      return element.replace(/<[^>]*>/g, "").trim();
+    });
+  }
   public processHtmlDocument(documentContext: string): string[] {
     return this.filterInvalidElements(parseHtmlToArray(documentContext));
   }
@@ -211,7 +217,10 @@ export const useDocument = create<RefineState>((set) => {
         const newDocument = documentProcessor.processHtmlDocument(documentContext);
 
         // Find differences between previous and new document
-        const differences = deepDiff.diff(state.preDocument, newDocument);
+        const differences = deepDiff.diff(
+          DocumentProcessor.prepareDiff(state.preDocument),
+          DocumentProcessor.prepareDiff(newDocument)
+        );
 
         // Exit early if no differences
         if (!differences || differences.length === 0) {

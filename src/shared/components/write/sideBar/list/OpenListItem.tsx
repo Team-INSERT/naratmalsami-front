@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import loanword from "/public/images/icon/loanword.svg";
 import * as All from "./ErrorListItem";
-
 interface OpenListItemProps {
   default: string;
   refine: string;
   description: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  error_id?: string;
 }
 
 export default function OpenListItem({
@@ -14,6 +14,7 @@ export default function OpenListItem({
   refine,
   description,
   onClick,
+  error_id,
 }: OpenListItemProps) {
   return (
     <>
@@ -32,17 +33,29 @@ export default function OpenListItem({
           <RefineBox>
             <RefineTest>나는 이 일을</RefineTest>
             <DeleteText>{def}</DeleteText>
-            <RefinedText>
-              {refine}
-            </RefinedText>
-              <RefineTest>할 수 있어</RefineTest>
+            <RefinedText>{refine}</RefinedText>
+            <RefineTest>할 수 있어</RefineTest>
           </RefineBox>
           <Buttons>
             <RefineButton>
-              <RefineButtonText>다듬기</RefineButtonText>
+              <RefineButtonText
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("다듬기 버튼 클릭", error_id);
+                }}
+              >
+                다듬기
+              </RefineButtonText>
             </RefineButton>
             <RefusalButton>
-              <RefusalButtonText>거절하기</RefusalButtonText>
+              <RefusalButtonText
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("거절하기 버튼 클릭", error_id);
+                }}
+              >
+                거절하기
+              </RefusalButtonText>
             </RefusalButton>
           </Buttons>
         </OpenListBox>
@@ -53,7 +66,7 @@ export default function OpenListItem({
 
 const VerticalLine = styled.div`
   width: 4px;
-  background-color: #E2E2E2;
+  background-color: #e2e2e2;
   place-self: stretch;
   border-radius: 2px;
   margin: 0;
@@ -62,7 +75,7 @@ const VerticalLine = styled.div`
 const OpenListItemBox = styled.div`
   display: flex;
   width: 100%;
-  height: 100%;
+  height: fit-content;
   padding: 10px 6px 10px 10px;
   align-items: flex-start;
   gap: 10px;
@@ -97,7 +110,7 @@ const RefineTest = styled.span`
   line-height: normal;
 `;
 const DeleteText = styled(RefineTest)`
-  color: #afb1c3; 
+  color: #afb1c3;
   text-decoration: line-through;
 `;
 
