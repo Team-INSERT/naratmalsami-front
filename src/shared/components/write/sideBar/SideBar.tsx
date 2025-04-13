@@ -7,38 +7,39 @@ import { useDocument } from "@/shared/stores/useDocument";
 import React from "react";
 const error_description = ["", "불필요한 외래어 사용"];
 export default function SideBar() {
-  const { errors, setChoiceError, choiceError } = useDocument();
+  const { errorParagraphs, setChoiceError, choiceError } = useDocument();
 
   return (
     <React.Fragment>
       <SideBarBox>
         <TabsBlock />
         <SideBarMain>
-          {errors?.map((error) => (
-            <div key={error.error_id}>
-              {error.error_id === choiceError ? (
-                <OpenListItem
-                  key={error.error_id}
-                  default={error.error[0].origin_word}
-                  refine={error.error[0].refine_word[0]}
-                  description={error_description[error.error[0].code]}
-                  error_id={error.error_id}
-                  onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                    if ((e.target as HTMLElement).tagName === "BUTTON") return;
-                    setChoiceError("");
-                  }}
-                />
-              ) : (
-                <ListItem
-                  key={error.error_id}
-                  default={error.error[0].origin_word}
-                  description={error_description[error.error[0].code]}
-                  onClick={() => setChoiceError(error.error_id)}
-                />
-              )}
-              <Spacer />
-            </div>
-          ))}
+          {errorParagraphs?.map((errorsInParagraph) => {
+            return errorsInParagraph.errors.map((error) => (
+              <div key={error.error_id}>
+                {error.error_id === choiceError ? (
+                  <OpenListItem
+                    key={error.error_id}
+                    errorDetail={error}
+                    description={error_description[error.code]}
+                    error_id={error.error_id}
+                    onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                      if ((e.target as HTMLElement).tagName === "BUTTON") return;
+                      setChoiceError("");
+                    }}
+                  />
+                ) : (
+                  <ListItem
+                    key={error.error_id}
+                    default={error.origin_word}
+                    description={error_description[error.code]}
+                    onClick={() => setChoiceError(error.error_id)}
+                  />
+                )}
+                <Spacer />
+              </div>
+            ));
+          })}
         </SideBarMain>
       </SideBarBox>
     </React.Fragment>

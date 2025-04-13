@@ -1,21 +1,24 @@
 import styled from "styled-components";
 import loanword from "/public/images/icon/loanword.svg";
 import * as All from "./ErrorListItem";
+import { useDocument } from "@/shared/stores/useDocument";
+import { ErrorDetail } from "@/shared/stores/error";
+
 interface OpenListItemProps {
-  default: string;
-  refine: string;
+  errorDetail: ErrorDetail;
   description: string;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   error_id?: string;
 }
 
 export default function OpenListItem({
-  default: def,
-  refine,
+  errorDetail,
   description,
   onClick,
   error_id,
 }: OpenListItemProps) {
+  const { replaceWord } = useDocument();
+
   return (
     <>
       <OpenListItemBox onClick={onClick}>
@@ -26,14 +29,14 @@ export default function OpenListItem({
             <All.ContextBox>
               <All.Description>{description}</All.Description>
               <All.Text>
-                {def} → <RefinedText>{refine}</RefinedText>
+                {errorDetail.origin_word} → <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
               </All.Text>
             </All.ContextBox>
           </All.ListContentBox>
           <RefineBox>
             <RefineTest>나는 이 일을</RefineTest>
-            <DeleteText>{def}</DeleteText>
-            <RefinedText>{refine}</RefinedText>
+            <DeleteText>{errorDetail.origin_word}</DeleteText>
+            <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
             <RefineTest>할 수 있어</RefineTest>
           </RefineBox>
           <Buttons>
@@ -42,6 +45,7 @@ export default function OpenListItem({
                 onClick={(e) => {
                   e.stopPropagation();
                   console.log("다듬기 버튼 클릭", error_id);
+                  replaceWord(errorDetail);
                 }}
               >
                 다듬기
