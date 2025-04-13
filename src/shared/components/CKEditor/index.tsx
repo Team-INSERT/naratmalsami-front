@@ -486,6 +486,7 @@ export default function CKEditorComponent() {
                         console.log("Editor is ready to use!", editor);
                         // 에디터 인스턴스 저장
                         editorRef.current = editor;
+                        initDocument(editorRef);
                         const wordCount = editor.plugins.get("WordCount");
                         editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
                         editorToolbarRef.current.appendChild(editor.ui.view.toolbar.element);
