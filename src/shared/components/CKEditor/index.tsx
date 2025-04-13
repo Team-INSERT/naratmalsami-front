@@ -220,26 +220,34 @@ export default function CKEditorComponent() {
   // 파일 데이터 호출
   useEffect(() => {
     (async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/files/${hashed_id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
+      if (import.meta.env.VITE_MOCK_DATA) {
+        setFileData({
+          title: "Sample Title",
+          content: "Sample Content",
+          hashed_id: "sample-hashed-id",
+          updated_at: new Date().toISOString(),
         });
-        const data = await response.json();
-
-        // 파일 데이터 설정
-        setFileData(data);
-        // 추후 파일 데이터와 zustand를 활용한 전역변수를 합칠 생각도 해야함
-        initDocument(data.content);
-
-        // CKEditor 준비 완료
         setIsLayoutReady(true);
-        return () => setIsLayoutReady(false);
-      } catch (error) {
-        console.error("Error:", error);
+      } else {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/files/${hashed_id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+          const data = await response.json();
+          // 파일 데이터 설정
+          setFileData(data);
+          // 추후 파일 데이터와 zustand를 활용한 전역변수를 합칠 생각도 해야함
+          initDocument(data.content);
+          // CKEditor 준비 완료
+          setIsLayoutReady(true);
+          return () => setIsLayoutReady(false);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       }
     })();
   }, []);
