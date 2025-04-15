@@ -87,7 +87,7 @@ import "ckeditor5/ckeditor5.css";
 import "./style.css";
 // import { useDocument } from "@/shared/stores/useDocument";
 import { DocumentManager } from "@/shared/stores/DocumentManager";
-import generateUniqueId from "@/utils/generateUniqueId";
+import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import * as S from "./WriteHeader/style";
 import Timer from "tiny-timer";
 
@@ -189,7 +189,7 @@ export default function CKEditorComponent() {
       // Only select direct children using :scope > *
       parentDiv.querySelectorAll(":scope > *").forEach((el) => {
         if (!el.hasAttribute("data-unique")) {
-          el.setAttribute("data-unique", generateUniqueId("unique-"));
+          el.setAttribute("data-unique", generateUniqueId(Prefix.UNIQUE));
         }
       });
     }
@@ -210,14 +210,14 @@ export default function CKEditorComponent() {
     timer.on("done", () => {
       grantDataUnique();
       const currentVirtualData = getParent() || "";
-      documentManager.updateDocument(currentVirtualData);
+      documentManager.handleDocumentModifications(currentVirtualData);
     });
 
     // 컴포넌트 언마운트 시 타이머 정리
     return () => {
       timer.stop();
     };
-  }, [documentManager.updateDocument]);
+  }, [documentManager.handleDocumentModifications]);
 
   // 파일 데이터 호출
   useEffect(() => {

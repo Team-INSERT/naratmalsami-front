@@ -30,7 +30,7 @@ export class DocumentManager {
     );
   }
 
-  public async updateDocument(documentContext: string): Promise<void> {
+  public async handleDocumentModifications(documentContext: string): Promise<void> {
     const editedDocument = this.documentProcessor.processHtmlDocument(documentContext);
     const previousDocument = DocumentManager.documentDomainService.getPreviousDocuments();
 

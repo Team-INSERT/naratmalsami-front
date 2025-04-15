@@ -1,5 +1,5 @@
 import { ErrorsInParagraph, ErrorDetail, ErrorsInParagraphData } from "@/shared/stores/error";
-import generateUniqueId from "@/utils/generateUniqueId";
+import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import DecoupledEditor from "@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor";
 import replaceSubstring from "@/utils/replaceSubstring";
 
@@ -92,10 +92,10 @@ export class DocumentService {
         const errorsInParagraph: ErrorsInParagraph = {
           errors: refinement.errors.map((errorItem) => ({
             ...errorItem,
-            error_id: generateUniqueId("error-"),
+            error_id: generateUniqueId(Prefix.ERROR),
           })),
           target_id: refinement.target_id,
-          errorParagraph_id: generateUniqueId("paragraph-error-"),
+          errorParagraph_id: generateUniqueId(Prefix.PARAGRAPH_ERROR),
         };
 
         this.errorParagraphs.push(errorsInParagraph);

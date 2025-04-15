@@ -1,6 +1,6 @@
 import { ErrorsInParagraphData, ErrorDetail } from "@/shared/stores/error";
 import { refineForeign } from "./ai/refineForeign";
-import generateUniqueId from "./generateUniqueId";
+import generateUniqueId, { Prefix } from "./generateUniqueId";
 
 export class AiService {
   static async getAiRefinements(modifiedElements: string[]): Promise<ErrorsInParagraphData[]> {
@@ -18,7 +18,7 @@ export class AiService {
 
       const errorWithIds = element.errors.map((errorItem) => ({
         ...errorItem,
-        error_id: generateUniqueId("error-"),
+        error_id: generateUniqueId(Prefix.ERROR),
       }));
 
       yield {
@@ -58,7 +58,7 @@ export class AiService {
           origin_word: element.textContent?.split(" ")[0] || "",
           refine_word: ["자료", "정보"],
           index: 0,
-          error_id: generateUniqueId("error-"),
+          error_id: generateUniqueId(Prefix.ERROR),
         },
       ];
       errorData.push({ target_id, errors: error });
