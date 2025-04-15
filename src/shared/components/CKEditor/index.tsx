@@ -85,7 +85,8 @@ import {
 import "ckeditor5/ckeditor5.css";
 
 import "./style.css";
-import { useDocument } from "@/shared/stores/useDocument";
+// import { useDocument } from "@/shared/stores/useDocument";
+import { DocumentManager } from "@/shared/stores/DocumentManager";
 import generateUniqueId from "@/utils/generateUniqueId";
 import * as S from "./WriteHeader/style";
 import Timer from "tiny-timer";
@@ -95,6 +96,8 @@ const LICENSE_KEY = "GPL";
 
 const IDAttribute = "idUnique";
 const DataAttribute = "data-unique";
+
+const documentManager = new DocumentManager();
 class CustomAttributeplugin extends Plugin {
   init() {
     this._defineSchema();
@@ -162,7 +165,6 @@ export default function CKEditorComponent() {
   const [isLayoutReady, setIsLayoutReady] = useState(false);
   const { hashed_id } = useParams();
   const timerRef = useRef(new Timer());
-  const { updateDocument, initDocument } = useDocument();
 
   // 파일 데이터 정의
   interface fileDataType {
@@ -208,14 +210,14 @@ export default function CKEditorComponent() {
     timer.on("done", () => {
       grantDataUnique();
       const currentVirtualData = getParent() || "";
-      updateDocument(currentVirtualData, editorRef);
+      documentManager.updateDocument(currentVirtualData);
     });
 
     // 컴포넌트 언마운트 시 타이머 정리
     return () => {
       timer.stop();
     };
-  }, [updateDocument]);
+  }, [documentManager.updateDocument]);
 
   // 파일 데이터 호출
   useEffect(() => {
@@ -241,7 +243,7 @@ export default function CKEditorComponent() {
           // 파일 데이터 설정
           setFileData(data);
           // 추후 파일 데이터와 zustand를 활용한 전역변수를 합칠 생각도 해야함
-          initDocument(data.content);
+          // initDocument(data.content);
           // CKEditor 준비 완료
           setIsLayoutReady(true);
           return () => setIsLayoutReady(false);
@@ -494,7 +496,7 @@ export default function CKEditorComponent() {
                         console.log("Editor is ready to use!", editor);
                         // 에디터 인스턴스 저장
                         editorRef.current = editor;
-                        initDocument(editorRef);
+                        documentManager.initDocument(editorRef);
                         const wordCount = editor.plugins.get("WordCount");
                         editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
                         editorToolbarRef.current.appendChild(editor.ui.view.toolbar.element);

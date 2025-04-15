@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import loanword from "/public/images/icon/loanword.svg";
 import * as All from "./ErrorListItem";
-import { useDocument } from "@/shared/stores/useDocument";
+import { DocumentManager } from "@/shared/stores/DocumentManager";
 import { ErrorDetail } from "@/shared/stores/error";
 
+const documentManager = new DocumentManager();
 interface OpenListItemProps {
   errorDetail: ErrorDetail;
   description: string;
@@ -17,8 +18,6 @@ export default function OpenListItem({
   onClick,
   error_id,
 }: OpenListItemProps) {
-  const { replaceWord } = useDocument();
-
   return (
     <>
       <OpenListItemBox onClick={onClick}>
@@ -45,7 +44,7 @@ export default function OpenListItem({
                 onClick={(e) => {
                   e.stopPropagation();
                   console.log("다듬기 버튼 클릭", error_id);
-                  replaceWord(errorDetail);
+                  documentManager.resolveError(errorDetail);
                 }}
               >
                 다듬기

@@ -1,11 +1,59 @@
-import { refineForeign } from "@/utils/ai/refineForeign";
-import generateUniqueId from "@/utils/generateUniqueId";
 import { parseHtmlToArray } from "@/utils/parseHtmlToArray";
 import deepDiff from "deep-diff";
-import { ErrorsInParagraphData, ErrorDetail } from "../shared/stores/error";
-import { allowedHtmlTags } from "../shared/stores/useDocument";
 
-export class DocumentProcessor {
+export const allowedHtmlTags = [
+  // 기본 텍스트 태그
+  "p",
+  "span",
+  // "br",
+  "hr",
+
+  // 제목 태그
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+
+  // 강조 및 스타일 태그
+  "b",
+  "strong",
+  "i",
+  "em",
+  "u",
+  "mark",
+  "small",
+  "del",
+  "ins",
+  "sub",
+  "sup",
+
+  // 인용 및 코드 관련 태그
+  "blockquote",
+  "q",
+  "cite",
+  "code",
+  "pre",
+  "kbd",
+  "samp",
+  "var",
+
+  // 목록 관련 태그
+  "li",
+  "dt",
+  "dd",
+
+  // 테이블 관련 태그
+  "th",
+  "td",
+  "caption",
+  "tbody",
+  "thead",
+  "tfoot",
+];
+
+export class HtmlProcessor {
   static prepareDiff(preDocument: string[]): string[] {
     return preDocument.map((element) => {
       // HTML 태그를 제거하고
@@ -79,68 +127,5 @@ export class DocumentProcessor {
 
     // 변경된 요소를 추출
     return uniqueIndices.map((index) => newDocument[index]);
-  }
-
-  public async getAiRefinements(modifiedElements: string[]): Promise<ErrorsInParagraphData[]> {
-    return import.meta.env.VITE_USE_MOCK_API === "true"
-      ? this.fetchAiRefinementsMock(modifiedElements)
-      : this.fetchAiRefinements(modifiedElements);
-  }
-  public async *fetchAiRefinementsLocal(
-    modifiedElements: string[]
-  ): AsyncGenerator<ErrorsInParagraphData> {
-    const generator = refineForeign(modifiedElements);
-
-    for await (const element of generator) {
-      console.log(element);
-
-      const errorWithIds = element.errors.map((errorItem) => ({
-        ...errorItem,
-        error_id: generateUniqueId("error-"),
-      }));
-
-      yield {
-        target_id: element.target_id,
-        errors: errorWithIds,
-      };
-    }
-  }
-  private async fetchAiRefinements(modifiedElements: string[]): Promise<ErrorsInParagraphData[]> {
-    const response = await fetch(`${import.meta.env.VITE_AI_API_URL}/ai/refine`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: '<p data-unique="e-0">http</p>',
-        content: modifiedElements,
-      }),
-      mode: "cors",
-    });
-
-    return response.json();
-  }
-  private async fetchAiRefinementsMock(
-    modifiedElements: string[]
-  ): Promise<ErrorsInParagraphData[]> {
-    //use domparser
-    const parser = new DOMParser();
-    const document = parser.parseFromString(modifiedElements.join(""), "text/html");
-    const errorData: ErrorsInParagraphData[] = [];
-    const elements = document.querySelectorAll("[data-unique]");
-    elements.forEach((element) => {
-      const target_id = element.getAttribute("data-unique") || "";
-      const error: ErrorDetail[] = [
-        {
-          code: 0,
-          origin_word: element.textContent?.split(" ")[0] || "",
-          refine_word: ["자료", "정보"],
-          index: 0,
-          error_id: generateUniqueId("error-"),
-        },
-      ];
-      errorData.push({ target_id, errors: error });
-    });
-    return errorData;
   }
 }
