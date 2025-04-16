@@ -163,18 +163,10 @@ export class DocumentService {
     return this.errorParagraphsRepository.subscribe(listener);
   }
 
-  /**
-   * 이전 문서 목록을 저장합니다.
-   * @param documents 문서 문자열 배열
-   */
   public setPreviousDocuments(documents: string[]): void {
     this.previousDocuments = documents;
   }
 
-  /**
-   * 이전 문서 목록을 반환합니다.
-   * @returns 이전 문서 문자열 배열
-   */
   public getPreviousDocuments(): string[] {
     return this.previousDocuments;
   }
