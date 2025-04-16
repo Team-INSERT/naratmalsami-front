@@ -7,20 +7,38 @@ import { ErrorParagraphsRepository } from "./ErrorParagraphsRepository";
 export interface EditorRef {
   current: DecoupledEditor | null;
 }
-
+/**
+ * 문서 내 외래어 단어 감지, 하이라이트, 교정 반영을 담당하는 서비스 클래스입니다.
+ * @class DocumentService
+ */
 export class DocumentService {
   private editorRef: EditorRef = { current: null };
   private previousDocuments: string[] = [];
-
   private errorParagraphsRepository: ErrorParagraphsRepository = new ErrorParagraphsRepository();
+
+  /**
+   * 에디터 참조를 초기화합니다.
+   * @param editorRef 에디터 참조 객체
+   */
   public initDocument(editorRef: EditorRef): void {
     this.editorRef = editorRef;
   }
 
+  /**
+   * 현재 document를 깊은 복사하여 반환합니다.
+   * @returns 복제된 Document 객체
+   */
   private _getClonedDocument(): Document {
     return document.cloneNode(true) as Document;
   }
 
+  /**
+   * 주어진 인덱스에 특정 단어가 존재하는지 확인합니다.
+   * @param text 전체 텍스트
+   * @param word 찾을 단어
+   * @param index 검사할 인덱스
+   * @returns 단어 존재 여부 (boolean)
+   */
   private _doesWordExistAtIndex(text: string, word: string, index: number): boolean {
     const existsAtIndex = text.slice(index, index + word.length) === word;
     if (!existsAtIndex) {
@@ -29,10 +47,21 @@ export class DocumentService {
     return existsAtIndex;
   }
 
+  /**
+   * 외래어 단어를 감싸는 span 태그 문자열을 생성합니다.
+   * @param id 외래어 식별자
+   * @param text 감쌀 텍스트
+   * @returns span 태그 문자열
+   */
   private _createErrorSpan(id: string, text: string): string {
     return `<span id="${id}" class="__origin_word__">${text}</span>`;
   }
 
+  /**
+   * 요소 내 외래어 단어들을 span으로 감싸 하이라이트 처리합니다.
+   * @param element 대상 요소
+   * @param errorsInParagraph 외래어 정보가 포함된 단락 데이터
+   */
   private _processErrorsInElement(element: Element, errorsInParagraph: ErrorsInParagraph): void {
     let currentHTML = element.innerHTML;
     const errors = errorsInParagraph.errors;
@@ -61,6 +90,11 @@ export class DocumentService {
     element.innerHTML = currentHTML;
   }
 
+  /**
+   * 외래어 정보를 기반으로 문서 내 특정 요소에 외래어 표시를 바인딩합니다.
+   * @param errorData 외래어 정보가 포함된 단락 데이터
+   * @returns 외래어가 바인딩된 복제 문서
+   */
   async bindErrorsToElement(errorData: ErrorsInParagraph): Promise<Document> {
     const clonedDocument = this._getClonedDocument();
     const targetElement = clonedDocument.querySelector(`[data-unique="${errorData.target_id}"]`);
@@ -70,6 +104,11 @@ export class DocumentService {
     return clonedDocument;
   }
 
+  /**
+   * 특정 외래어 단어를 교정 단어로 대체합니다.
+   * @param error 외래어 상세 정보
+   * @returns 교정이 반영된 복제 문서
+   */
   public resolveError(error: ErrorDetail): Document {
     const clonedDocument = this._getClonedDocument();
     const targetElement = clonedDocument.querySelector(`#${error.error_id}`);
@@ -83,6 +122,10 @@ export class DocumentService {
     return clonedDocument;
   }
 
+  /**
+   * AI 교정 결과를 비동기적으로 받아 문서에 반영합니다.
+   * @param aiRefinements AI 교정 결과 AsyncGenerator
+   */
   public async handleAiRefinement(
     aiRefinements: AsyncGenerator<ErrorsInParagraphData>
   ): Promise<void> {
@@ -103,22 +146,43 @@ export class DocumentService {
     }
   }
 
+  /**
+   * 복제된 문서의 내용을 에디터에 반영합니다.
+   * @param document 반영할 Document 객체
+   */
   private _setDocumentToEditor(document: Document): void {
     this.editorRef.current?.setData(document.querySelector(".ck-content")?.innerHTML as string);
   }
 
+  /**
+   * 외래어 단락 저장소의 변경을 구독합니다.
+   * @param listener 변경 시 호출될 콜백 함수
+   * @returns 구독 해제 함수
+   */
   public subscribe(listener: () => void): () => void {
     return this.errorParagraphsRepository.subscribe(listener);
   }
 
-  // Getters and Setters
-
+  /**
+   * 이전 문서 목록을 저장합니다.
+   * @param documents 문서 문자열 배열
+   */
   public setPreviousDocuments(documents: string[]): void {
     this.previousDocuments = documents;
   }
+
+  /**
+   * 이전 문서 목록을 반환합니다.
+   * @returns 이전 문서 문자열 배열
+   */
   public getPreviousDocuments(): string[] {
     return this.previousDocuments;
   }
+
+  /**
+   * 현재 저장된 외래어 단락 목록을 반환합니다.
+   * @returns 외래어 단락 배열 (읽기 전용)
+   */
   public getErrorParagraphs(): ReadonlyArray<ErrorsInParagraph> {
     return this.errorParagraphsRepository.getErrorParagraphs();
   }
