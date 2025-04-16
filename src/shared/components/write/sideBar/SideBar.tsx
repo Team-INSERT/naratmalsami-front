@@ -23,7 +23,7 @@ export default function SideBar() {
   }, [documentManager]);
 
   React.useEffect(() => {
-    console.log(`${errorParagraphs}`);
+    console.log(`errorParagraphs Updated:`, errorParagraphs);
   }, [errorParagraphs]);
   return (
     <React.Fragment>
