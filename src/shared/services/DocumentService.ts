@@ -2,7 +2,7 @@ import { ErrorsInParagraph, ErrorDetail, ErrorsInParagraphData } from "@/shared/
 import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import DecoupledEditor from "@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor";
 import replaceSubstring from "@/utils/replaceSubstring";
-import { ErrorParagraphsRepository } from "./errorParagraphsRepository";
+import { ErrorParagraphsRepository } from "./ErrorParagraphsRepository";
 
 export interface EditorRef {
   current: DecoupledEditor | null;
