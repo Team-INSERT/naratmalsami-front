@@ -26,6 +26,9 @@ export const dify = (foreignSentence: foreignSentenceType) => {
   ).then(response => {
     const responseText = response.data.data.outputs.text;
     const match = responseText.match(/\{[\s\S]*\}/);
+    if(!match) {
+      throw new Error("No valid JSON found in response");
+    }
     const parsedJson = JSON.parse(match[0]);
     Object.assign(result, parsedJson)
 
