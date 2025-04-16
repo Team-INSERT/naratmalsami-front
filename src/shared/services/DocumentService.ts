@@ -11,9 +11,7 @@ export class DocumentService {
   private editorRef: EditorRef = { current: null };
   private isProcessing: boolean = false;
   private previousDocuments: string[] = [];
-  private errorParagraphs: ErrorsInParagraph[] = [];
-  private selectedErrorId: string = "";
-
+  private errorParagraphs: ReadonlyArray<ErrorsInParagraph> = []; // ReadonlyArray로 변경하여 불변성을 유지, 불변성이 없다면 useState에서 변경사항을 캐치하지 못함
   public initDocument(editorRef: EditorRef): void {
     this.editorRef = editorRef;
   }
@@ -25,7 +23,7 @@ export class DocumentService {
   private doesWordExistAtIndex(text: string, word: string, index: number): boolean {
     const existsAtIndex = text.slice(index, index + word.length) === word;
     if (!existsAtIndex) {
-      console.error(`Word "${word}" does not exist at index ${index} in the text.`);
+      console.error(`Word "${word}" does not exist at index ${index} in the text.\nText: ${text}`);
     }
     return existsAtIndex;
   }
@@ -65,6 +63,7 @@ export class DocumentService {
     const targetElement = clonedDocument.querySelector(`[data-unique="${errorData.target_id}"]`);
 
     if (targetElement) this.processErrorsInElement(targetElement, errorData.errors);
+    this.notify();
 
     return clonedDocument;
   }
@@ -78,6 +77,14 @@ export class DocumentService {
     }
 
     this.setDocumentToEditor(clonedDocument);
+    this.errorParagraphs = this.errorParagraphs
+      .map((errorParagraph) => ({
+        target_id: errorParagraph.target_id,
+        errorParagraph_id: errorParagraph.errorParagraph_id,
+        errors: errorParagraph.errors.filter((errorItem) => errorItem.error_id !== error.error_id),
+      }))
+      .filter((errorParagraph) => errorParagraph.errors.length > 0);
+    this.notify();
 
     return clonedDocument;
   }
@@ -98,7 +105,7 @@ export class DocumentService {
           errorParagraph_id: generateUniqueId(Prefix.PARAGRAPH_ERROR),
         };
 
-        this.errorParagraphs.push(errorsInParagraph);
+        this.errorParagraphs = [...this.errorParagraphs, errorsInParagraph];
 
         const processedDocument = await this.errorToBinding(errorsInParagraph);
         this.setDocumentToEditor(processedDocument);
@@ -112,6 +119,20 @@ export class DocumentService {
     this.editorRef.current?.setData(document.querySelector(".ck-content")?.innerHTML as string);
   }
 
+  // For React
+  private listners: (() => void)[] = [];
+  public subscribe(listener: () => void): () => void {
+    this.listners.push(listener);
+    return this.unsubscribe.bind(this, listener);
+  }
+  private unsubscribe(listener: () => void): void {
+    this.listners = this.listners.filter((l) => l !== listener);
+  }
+  private notify(): void {
+    console.log("notify");
+    this.listners.forEach((listener) => listener());
+  }
+
   // Getters and Setters
 
   public setPreviousDocuments(documents: string[]): void {
@@ -120,13 +141,7 @@ export class DocumentService {
   public getPreviousDocuments(): string[] {
     return this.previousDocuments;
   }
-  public getErrorParagraphs(): ErrorsInParagraph[] {
+  public getErrorParagraphs(): ReadonlyArray<ErrorsInParagraph> {
     return this.errorParagraphs;
-  }
-  public getSelectedErrorId(): string {
-    return this.selectedErrorId;
-  }
-  public selectErrorId(id: string): void {
-    this.selectedErrorId = id;
   }
 }

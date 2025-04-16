@@ -12,16 +12,3 @@ export interface ErrorsInParagraphData {
 export interface ErrorsInParagraph extends ErrorsInParagraphData {
   errorParagraph_id: string;
 }
-
-export interface RefineState {
-  preDocument: string[];
-  replaceWord: (error: ErrorDetail) => void;
-  editorRef: any;
-  initDocument: (editorRef: any) => void;
-  updateDocument: (documentContext: string, editorRef: any) => void;
-  onProcessing: boolean;
-  errorParagraphs: ErrorsInParagraph[];
-  appendErrors: (newErrors: ErrorsInParagraph) => void;
-  choiceError: string;
-  setChoiceError: (error_id: string) => void;
-}

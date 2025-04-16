@@ -4,7 +4,6 @@ import { HtmlProcessor } from "@/utils/HtmlProcessor";
 import { AiService } from "@/utils/AiService";
 import { DocumentService } from "@/shared/services/DocumentService";
 import { EditorRef } from "@/shared/services/DocumentService";
-
 export class DocumentManager {
   private documentProcessor: HtmlProcessor = new HtmlProcessor();
   private static documentDomainService: DocumentService;
@@ -54,14 +53,14 @@ export class DocumentManager {
     DocumentManager.documentDomainService.setPreviousDocuments(editedDocument);
   }
 
+  // for React
+
+  public subscribe(listener: () => void): () => void {
+    return DocumentManager.documentDomainService.subscribe(listener);
+  }
+
   // Getters and Setters
-  public getErrorParagraphs(): ErrorsInParagraph[] {
+  public getErrorParagraphs(): ReadonlyArray<ErrorsInParagraph> {
     return DocumentManager.documentDomainService.getErrorParagraphs();
-  }
-  public getSelectedErrorId(): string {
-    return DocumentManager.documentDomainService.getSelectedErrorId();
-  }
-  public setSelectedErrorId(errorId: string): void {
-    DocumentManager.documentDomainService.selectErrorId(errorId);
   }
 }

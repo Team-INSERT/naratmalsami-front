@@ -2,21 +2,38 @@ import styled from "styled-components";
 import TabsBlock from "./tabs/TabsBlock";
 import ListItem from "./list/ErrorListItem";
 import OpenListItem from "./list/OpenListItem";
-import React from "react";
+import React, { useState } from "react";
 import { DocumentManager } from "@/shared/stores/DocumentManager";
 const error_description = ["", "불필요한 외래어 사용"];
 export default function SideBar() {
-  const documentManager = new DocumentManager();
-  
+  const documentManager = React.useMemo(() => new DocumentManager(), []);
+  const [selectedErrorId, setSelectedErrorId] = useState("");
+  const [errorParagraphs, setErrorParagraphs] = useState(documentManager.getErrorParagraphs());
+
+  React.useEffect(() => {
+    console.log("subscription");
+    const unsubscribe = documentManager.subscribe(() => {
+      console.log("event");
+      setErrorParagraphs(documentManager.getErrorParagraphs());
+    });
+    return () => {
+      console.log("unsubscribe");
+      unsubscribe();
+    };
+  }, [documentManager]);
+
+  React.useEffect(() => {
+    console.log(`${errorParagraphs}`);
+  }, [errorParagraphs]);
   return (
     <React.Fragment>
       <SideBarBox>
         <TabsBlock />
         <SideBarMain>
-          {documentManager.getErrorParagraphs()?.map((errorsInParagraph) => {
+          {errorParagraphs.map((errorsInParagraph) => {
             return errorsInParagraph.errors.map((error) => (
               <div key={error.error_id}>
-                {error.error_id === documentManager.getSelectedErrorId() ? (
+                {error.error_id === selectedErrorId ? (
                   <OpenListItem
                     key={error.error_id}
                     errorDetail={error}
@@ -24,7 +41,7 @@ export default function SideBar() {
                     error_id={error.error_id}
                     onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                       if ((e.target as HTMLElement).tagName === "BUTTON") return;
-                      documentManager.setSelectedErrorId("");
+                      setSelectedErrorId("");
                     }}
                   />
                 ) : (
@@ -32,7 +49,9 @@ export default function SideBar() {
                     key={error.error_id}
                     default={error.origin_word}
                     description={error_description[error.code]}
-                    onClick={() => documentManager.setSelectedErrorId(error.error_id)}
+                    onClick={() => {
+                      setSelectedErrorId(error.error_id);
+                    }}
                   />
                 )}
                 <Spacer />

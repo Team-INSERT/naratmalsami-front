@@ -90,6 +90,7 @@ import { DocumentManager } from "@/shared/stores/DocumentManager";
 import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import * as S from "./WriteHeader/style";
 import Timer from "tiny-timer";
+import React from "react";
 
 // const LICENSE_KEY = import.meta.env.VITE_CKEDITOR_LICENSE_KEY;
 const LICENSE_KEY = "GPL";
