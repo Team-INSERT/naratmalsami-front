@@ -117,8 +117,18 @@ export class DocumentService {
       targetElement.innerHTML = error.refine_word[0];
     }
 
+    this.errorParagraphsRepository.resolveErrorById(error.error_id);
+    console.log(targetElement);
+    if (targetElement?.parentElement) {
+      const parent = targetElement.parentElement;
+      // Move all child nodes of targetElement to its parent, before removing targetElement
+      while (targetElement.firstChild) {
+        parent.insertBefore(targetElement.firstChild, targetElement);
+      }
+      parent.removeChild(targetElement);
+    }
+    console.log(targetElement?.classList);
     this._setDocumentToEditor(clonedDocument);
-    this.errorParagraphsRepository.removeErrorById(error.error_id);
     return clonedDocument;
   }
 
@@ -177,5 +187,8 @@ export class DocumentService {
    */
   public getErrorParagraphs(): ReadonlyArray<ErrorsInParagraph> {
     return this.errorParagraphsRepository.getErrorParagraphs();
+  }
+  public getResolvedErrors(): ReadonlyArray<ErrorDetail> {
+    return this.errorParagraphsRepository.getResolvedErrors();
   }
 }

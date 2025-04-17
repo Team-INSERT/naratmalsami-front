@@ -99,7 +99,8 @@ const IDAttribute = "idUnique";
 const DataAttribute = "data-unique";
 
 const documentManager = new DocumentManager();
-class CustomAttributeplugin extends Plugin {
+
+class ForeignWordPlugin extends Plugin {
   init() {
     this._defineSchema();
     this._defineConverters();
@@ -360,7 +361,7 @@ export default function CKEditorComponent() {
           TodoList,
           Underline,
           WordCount,
-          CustomAttributeplugin,
+          ForeignWordPlugin,
         ],
         balloonToolbar: ["bold", "italic", "|", "link"],
         fontFamily: {

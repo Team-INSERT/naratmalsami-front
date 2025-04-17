@@ -4,17 +4,19 @@ import ListItem from "./list/ErrorListItem";
 import OpenListItem from "./list/OpenListItem";
 import React, { useState } from "react";
 import { DocumentManager } from "@/shared/stores/DocumentManager";
+import RefinedItem from "./list/RefinedItem";
 const error_description = ["", "불필요한 외래어 사용"];
 export default function SideBar() {
   const documentManager = React.useMemo(() => new DocumentManager(), []);
   const [selectedErrorId, setSelectedErrorId] = useState("");
   const [errorParagraphs, setErrorParagraphs] = useState(documentManager.getErrorParagraphs());
-
+  const [resolvedErrors, setResolvedErrors] = useState(documentManager.getResolvedErrors());
   React.useEffect(() => {
     console.log("subscription");
     const unsubscribe = documentManager.subscribe(() => {
       console.log("event");
       setErrorParagraphs(documentManager.getErrorParagraphs());
+      setResolvedErrors(documentManager.getResolvedErrors());
     });
     return () => {
       console.log("unsubscribe");
@@ -24,7 +26,8 @@ export default function SideBar() {
 
   React.useEffect(() => {
     console.log(`errorParagraphs Updated:`, errorParagraphs);
-  }, [errorParagraphs]);
+    console.log(`resolvedErrors Updated:`, resolvedErrors);
+  }, [errorParagraphs, resolvedErrors]);
   return (
     <React.Fragment>
       <SideBarBox>
@@ -57,6 +60,9 @@ export default function SideBar() {
                 <Spacer />
               </div>
             ));
+          })}
+          {resolvedErrors.map((resolvedError) => {
+            return <RefinedItem key={resolvedError.error_id} errorDetail={resolvedError} />;
           })}
         </SideBarMain>
       </SideBarBox>

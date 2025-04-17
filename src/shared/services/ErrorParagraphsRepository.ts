@@ -1,4 +1,4 @@
-import { ErrorsInParagraph } from "../stores/error";
+import { ErrorDetail, ErrorsInParagraph } from "../stores/error";
 
 /**
  * 외래어가 포함된 문단과 그 문단에 포함된 외래어 정보를 관리하는 클래스입니다.
@@ -7,9 +7,11 @@ import { ErrorsInParagraph } from "../stores/error";
  */
 export class ErrorParagraphsRepository {
   private errorParagraphsMap: Map<string, ErrorsInParagraph> = new Map();
+  private resolvedErrorParagraphsMap: Map<string, ErrorDetail> = new Map();
 
   constructor() {
     this.errorParagraphsMap = new Map();
+    this.resolvedErrorParagraphsMap = new Map();
   }
   /**
    * 외래어 단락을 추가합니다.
@@ -22,11 +24,18 @@ export class ErrorParagraphsRepository {
     this._notify();
   }
 
+  private _addResolvedErrors(errors: ReadonlyArray<ErrorDetail>): void {
+    for (const error of errors) {
+      this.resolvedErrorParagraphsMap.set(error.error_id, error);
+    }
+    this._notify();
+  }
+
   /**
    * 외래어 단락을 외래어 단락 ID로 제거합니다.
    * @param errorParagraphId 외래어 단락 ID
    */
-  public removeErrorParagraphById(errorParagraphId: string): void {
+  public resolveErrorParagraphById(errorParagraphId: string): void {
     if (!errorParagraphId) throw new Error("errorParagraphId is undefined");
     // Find the entry with the given errorParagraph_id
     const entry = Array.from(this.errorParagraphsMap.values()).find(
@@ -34,6 +43,10 @@ export class ErrorParagraphsRepository {
     );
     if (!entry) throw new Error(`errorParagraphId ${errorParagraphId} not found`);
     this.errorParagraphsMap.delete(entry.target_id);
+    this.resolvedErrorParagraphsMap.set(
+      entry.target_id,
+      entry.errors.find((e) => e.error_id === entry.errorParagraph_id) as ErrorDetail
+    );
     this._notify();
   }
   /**
@@ -63,6 +76,15 @@ export class ErrorParagraphsRepository {
     throw new Error(`error_id ${error_id} not found`);
   }
 
+  public resolveErrorById(error_id: string) {
+    const entry = Array.from(this.errorParagraphsMap.values()).find((errorParagraph) =>
+      errorParagraph.errors.some((e) => e.error_id === error_id)
+    );
+    if (!entry) throw new Error(`Error with id ${error_id} not found`);
+    this._addResolvedErrors([entry.errors.find((e) => e.error_id === error_id) as ErrorDetail]);
+    this.removeErrorById(error_id);
+  }
+
   /**
    * 외래어 단락 목록을 가져옵니다.
    * @returns 외래어 단락 목록 (읽기 전용) ReadonlyArray<ErrorsInParagraph>
@@ -72,10 +94,19 @@ export class ErrorParagraphsRepository {
   }
 
   /**
+   * 해결된 외래어 단락 목록 조회
+   * @return {ReadonlyArray<ErrorsInParagraph>} 해결된 외래어 단락 목록
+   */
+  public getResolvedErrors(): ReadonlyArray<ErrorDetail> {
+    return Array.from(this.resolvedErrorParagraphsMap.values());
+  }
+
+  /**
    * 외래어 단락 목록을 초기화합니다.
    */
   public clearErrorParagraphs(): void {
     this.errorParagraphsMap.clear();
+    this.resolvedErrorParagraphsMap.clear();
     this._notify();
   }
   /**
