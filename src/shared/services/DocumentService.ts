@@ -54,7 +54,7 @@ export class DocumentService {
    * @returns span 태그 문자열
    */
   private _createErrorSpan(id: string, text: string): string {
-    return `<span id="${id}" class="__origin_word__">${text}</span>`;
+    return `<span originid="${id}" class="__origin_word__">${text}</span>`;
   }
 
   /**
@@ -111,24 +111,19 @@ export class DocumentService {
    */
   public resolveError(error: ErrorDetail): Document {
     const clonedDocument = this._getClonedDocument();
-    const targetElement = clonedDocument.querySelector(`#${error.error_id}`);
+    const targetElement = clonedDocument.querySelector(`[originid="${error.error_id}"]`);
 
     if (targetElement) {
       targetElement.innerHTML = error.refine_word[0];
+      this.errorParagraphsRepository.resolveErrorById(error.error_id);
+      console.log(targetElement);
+      targetElement?.removeAttribute("originid");
+      targetElement?.setAttribute("refineid", error.error_id);
+      this._setDocumentToEditor(clonedDocument);
+    } else {
+      console.error(`Element with originid="${error.error_id}" not found.`);
     }
 
-    this.errorParagraphsRepository.resolveErrorById(error.error_id);
-    console.log(targetElement);
-    if (targetElement?.parentElement) {
-      const parent = targetElement.parentElement;
-      // Move all child nodes of targetElement to its parent, before removing targetElement
-      while (targetElement.firstChild) {
-        parent.insertBefore(targetElement.firstChild, targetElement);
-      }
-      parent.removeChild(targetElement);
-    }
-    console.log(targetElement?.classList);
-    this._setDocumentToEditor(clonedDocument);
     return clonedDocument;
   }
 
