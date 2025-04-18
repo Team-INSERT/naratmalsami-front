@@ -8,12 +8,12 @@ export default function HoverTracker({
   children: React.ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const [originId, setOriginId] = useState<string | null>(null);
+  const [originId, setOriginId] = useState<string | undefined>(undefined);
   const [targetPosition, setTargetPosition] = useState({
     top: 0,
     left: 0,
   });
+  
   const handleMouseOver = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     const originId = target.attributes.getNamedItem("originid")?.value;
@@ -22,6 +22,7 @@ export default function HoverTracker({
       console.log("Hovered element originId:", originId);
       const containerRect = containerRef.current?.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
+
       let rect = { top: 0, left: 0 };
 
       if (containerRect) {
@@ -30,24 +31,24 @@ export default function HoverTracker({
           left: targetRect.left - containerRect.left,
         };
       }
-      setTargetPosition({ top: rect.top, left: rect.left });
-      setOriginId(originId);
-    } else {
-      setTargetPosition({ top: 0, left: 0 });
-      setOriginId(null);
+      setTargetPosition({
+        top: rect.top,
+        left: rect.left,
+      });
     }
+
+    setOriginId(originId);
+
   }, []);
 
   return (
     <div ref={containerRef} onMouseOver={handleMouseOver}>
       <S.Overlay>
-        {!!originId && (
-          <OverlayRecommendedBox
-            left={targetPosition.left}
-            top={targetPosition.top}
-            originId={originId}
-          />
-        )}
+        <OverlayRecommendedBox
+          left={targetPosition.left}
+          top={targetPosition.top}
+          originId={originId}
+        />
       </S.Overlay>
       {children}
     </div>
