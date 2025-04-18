@@ -81,6 +81,7 @@ import {
   WordCount,
   Plugin,
 } from "ckeditor5";
+import HoverTracker from "@/shared/components/overlay/HoverTracker";
 
 import "ckeditor5/ckeditor5.css";
 
@@ -235,6 +236,7 @@ export default function CKEditorComponent() {
         try {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/files/${hashed_id}`, {
             method: "GET",
+
             headers: {
               "Content-Type": "application/json",
             },
@@ -491,40 +493,43 @@ export default function CKEditorComponent() {
             <div className="editor-container__editor-wrapper">
               <div className="editor-container__editor">
                 <div>
-                  {isLayoutReady && editorConfig && (
-                    <CKEditor
-                      onReady={(editor) => {
-                        console.log("Editor is ready to use!", editor);
-                        // 에디터 인스턴스 저장
-                        editorRef.current = editor;
-                        documentManager.initDocument(editorRef);
-                        const wordCount = editor.plugins.get("WordCount");
-                        editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
-                        editorToolbarRef.current.appendChild(editor.ui.view.toolbar.element);
-                        editorMenuBarRef.current.appendChild(editor.ui.view.menuBarView.element);
 
-                        CKEditorInspector.attach(editor);
-                      }}
-                      onAfterDestroy={() => {
-                        Array.from(editorWordCountRef.current.children).forEach((child) =>
-                          child.remove()
-                        );
-                        Array.from(editorToolbarRef.current.children).forEach((child) =>
-                          child.remove()
-                        );
-                        Array.from(editorMenuBarRef.current.children).forEach((child) =>
-                          child.remove()
-                        );
-                      }}
-                      editor={DecoupledEditor}
-                      config={editorConfig}
-                      onChange={(event, editor) => {
-                        // 타이머 재시작
-                        const data = editor.getData();
-                        timerRef.current.stop();
-                        timerRef.current.start(3000);
-                      }}
-                    />
+                  {isLayoutReady && editorConfig && (
+                    <HoverTracker>
+                      <CKEditor
+                        onReady={(editor) => {
+                          console.log("Editor is ready to use!", editor);
+                          // 에디터 인스턴스 저장
+                          editorRef.current = editor;
+                          documentManager.initDocument(editorRef);
+                          const wordCount = editor.plugins.get("WordCount");
+                          editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
+                          editorToolbarRef.current.appendChild(editor.ui.view.toolbar.element);
+                          editorMenuBarRef.current.appendChild(editor.ui.view.menuBarView.element);
+
+                          CKEditorInspector.attach(editor);
+                        }}
+                        onAfterDestroy={() => {
+                          Array.from(editorWordCountRef.current.children).forEach((child) =>
+                            child.remove()
+                          );
+                          Array.from(editorToolbarRef.current.children).forEach((child) =>
+                            child.remove()
+                          );
+                          Array.from(editorMenuBarRef.current.children).forEach((child) =>
+                            child.remove()
+                          );
+                        }}
+                        editor={DecoupledEditor}
+                        config={editorConfig}
+                        onChange={(event, editor) => {
+                          // 타이머 재시작
+                          const data = editor.getData();
+                          timerRef.current.stop();
+                          timerRef.current.start(3000);
+                        }}
+                      />
+                    </HoverTracker>
                   )}
                   {!isLayoutReady && <div className="editor-loading">Loading editor...</div>}
                 </div>
