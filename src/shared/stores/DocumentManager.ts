@@ -107,4 +107,8 @@ export class DocumentManager {
   public getErrorParagraphs(): ReadonlyArray<ErrorsInParagraph> {
     return DocumentManager.documentService.getErrorParagraphs();
   }
+
+  public getResolvedErrors(): ReadonlyArray<ErrorDetail> {
+    return DocumentManager.documentService.getResolvedErrors();
+  }
 }

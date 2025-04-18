@@ -1,16 +1,13 @@
 import styled from "styled-components";
 import success from "/public/images/icon/success.svg";
 import * as All from "./ErrorListItem";
+import { ErrorDetail } from "@/shared/stores/error";
 
 interface RefinedItemProps {
-  default: string;
-  refine: string;
+  errorDetail: ErrorDetail;
 }
 
-export default function RefinedItem({
-  default: def,
-  refine,
-}: RefinedItemProps) {
+export default function RefinedItem({ errorDetail }: RefinedItemProps) {
   return (
     <>
       <RefinedItemBox>
@@ -19,7 +16,7 @@ export default function RefinedItem({
           <All.ContextBox>
             <All.Description>수정한 단어</All.Description>
             <All.Text>
-              {def} → <RefinedText>{refine}</RefinedText>
+              {errorDetail.origin_word} → <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
             </All.Text>
           </All.ContextBox>
         </ListContentBox>

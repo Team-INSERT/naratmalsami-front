@@ -79,7 +79,6 @@ import {
   TodoList,
   Underline,
   WordCount,
-  Plugin,
 } from "ckeditor5";
 import HoverTracker from "@/shared/components/overlay/HoverTracker";
 
@@ -91,73 +90,13 @@ import { DocumentManager } from "@/shared/stores/DocumentManager";
 import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import * as S from "./WriteHeader/style";
 import Timer from "tiny-timer";
-import React from "react";
+import { ForeignWordPlugin, RefinedWordPlugin } from "./Plugin/ForeignAndRefineWordPlugin";
+import { DataUniqueAttributePlugin } from "./Plugin/DataUniqueAttributePlugin";
 
 // const LICENSE_KEY = import.meta.env.VITE_CKEDITOR_LICENSE_KEY;
 const LICENSE_KEY = "GPL";
 
-const IDAttribute = "idUnique";
-const DataAttribute = "data-unique";
-
 const documentManager = new DocumentManager();
-class CustomAttributeplugin extends Plugin {
-  init() {
-    this._defineSchema();
-    this._defineConverters();
-  }
-  _defineSchema() {
-    const schema = this.editor.model.schema;
-    // 1. 모델 스키마에 customAttribute 허용
-    ["$text", "$block", "$root", "$container"].forEach((element) => {
-      schema.extend(element, {
-        allowAttributes: [IDAttribute, "data-unique"],
-      });
-    });
-  }
-  _defineConverters() {
-    const conversion = this.editor.conversion;
-    // to View
-    conversion.for("downcast").attributeToElement({
-      model: IDAttribute,
-      view: (modelAttributeValue, { writer }) => {
-        // console.log("ModelAttributeValue", modelAttributeValue);
-        return writer.createAttributeElement("span", {
-          id: modelAttributeValue,
-          class: "__origin_word__",
-        });
-      },
-    });
-    // to Model
-    conversion.for("upcast").elementToAttribute({
-      view: {
-        name: "span",
-        attributes: {
-          id: true,
-        },
-      },
-      model: {
-        key: IDAttribute,
-        value: (viewElement: HTMLElement) => {
-          // console.log("ViewElement", viewElement);
-          // console.log("ViewElement2", viewElement.getAttribute("id"));
-          return viewElement.getAttribute("id");
-        },
-      },
-    });
-
-    // to View
-    conversion.for("downcast").attributeToAttribute({
-      model: DataAttribute,
-      view: "data-unique",
-    });
-    // to Model
-    conversion.for("upcast").attributeToAttribute({
-      view: "data-unique",
-      model: DataAttribute,
-    });
-  }
-}
-
 export default function CKEditorComponent() {
   const editorContainerRef = useRef(null);
   const editorMenuBarRef = useRef(null);
@@ -362,7 +301,9 @@ export default function CKEditorComponent() {
           TodoList,
           Underline,
           WordCount,
-          CustomAttributeplugin,
+          DataUniqueAttributePlugin,
+          ForeignWordPlugin,
+          RefinedWordPlugin,
         ],
         balloonToolbar: ["bold", "italic", "|", "link"],
         fontFamily: {

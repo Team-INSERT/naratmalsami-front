@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+    dedupe: ["@ckeditor/ckeditor5-core", "@ckeditor/ckeditor5-engine", "@ckeditor/ckeditor5-utils"],
   },
   server: {
     allowedHosts: ["local.jhnara.asuscomm.com"],
