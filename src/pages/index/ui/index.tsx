@@ -17,7 +17,6 @@ const IndexPage = () => {
     <>
       <button onClick={() => login()}>로그인</button>
       <SideBar />
-      <OverlayRecommendedBox refineWord={"따자하오"} />
     </>
   );
 };
