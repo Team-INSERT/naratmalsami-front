@@ -7,11 +7,11 @@ import { ErrorDetail, ErrorsInParagraph } from "../stores/error";
  */
 export class ErrorParagraphsRepository {
   private errorParagraphsMap: Map<string, ErrorsInParagraph> = new Map();
-  private resolvedErrorParagraphsMap: Map<string, ErrorDetail> = new Map();
+  private resolvedErrorsMap: Map<string, ErrorDetail> = new Map();
 
   constructor() {
     this.errorParagraphsMap = new Map();
-    this.resolvedErrorParagraphsMap = new Map();
+    this.resolvedErrorsMap = new Map();
   }
   /**
    * 외래어 단락을 추가합니다.
@@ -26,7 +26,7 @@ export class ErrorParagraphsRepository {
 
   private _addResolvedErrors(errors: ReadonlyArray<ErrorDetail>): void {
     for (const error of errors) {
-      this.resolvedErrorParagraphsMap.set(error.error_id, error);
+      this.resolvedErrorsMap.set(error.error_id, error);
     }
     this._notify();
   }
@@ -43,7 +43,7 @@ export class ErrorParagraphsRepository {
     );
     if (!entry) throw new Error(`errorParagraphId ${errorParagraphId} not found`);
     this.errorParagraphsMap.delete(entry.target_id);
-    this.resolvedErrorParagraphsMap.set(
+    this.resolvedErrorsMap.set(
       entry.target_id,
       entry.errors.find((e) => e.error_id === entry.errorParagraph_id) as ErrorDetail
     );
@@ -60,10 +60,10 @@ export class ErrorParagraphsRepository {
     this._notify();
   }
   /**
-   * 외래어 단락에서 특정 외래어를 제거합니다.
+   * 외래어 단락데이터에서 특정 외래어를 제거합니다.
    * @param error_id 외래어 ID
    */
-  public removeErrorById(error_id: string) {
+  public deleteOriginWordById(error_id: string) {
     if (!error_id) throw new Error("error_id is undefined");
     for (const entry of this.errorParagraphsMap.values()) {
       const idx = entry.errors.findIndex((e) => e.error_id === error_id);
@@ -75,6 +75,21 @@ export class ErrorParagraphsRepository {
     }
     throw new Error(`error_id ${error_id} not found`);
   }
+  /**
+   * 순화된 외래어 단락 데이터에서 특정 순화어를 제거합니다.
+   * @param refine_id 순화어 ID
+   */
+  public deleteRefinedWordById(refine_id: string) {
+    if (!refine_id) throw new Error("error_id is undefined");
+    for (const entry of this.resolvedErrorsMap.values()) {
+      if (entry.error_id === refine_id) {
+        this.resolvedErrorsMap.delete(entry.error_id);
+        this._notify();
+        return;
+      }
+    }
+    throw new Error(`refine_id ${refine_id} not found`);
+  }
 
   public resolveErrorById(error_id: string) {
     const entry = Array.from(this.errorParagraphsMap.values()).find((errorParagraph) =>
@@ -82,7 +97,7 @@ export class ErrorParagraphsRepository {
     );
     if (!entry) throw new Error(`Error with id ${error_id} not found`);
     this._addResolvedErrors([entry.errors.find((e) => e.error_id === error_id) as ErrorDetail]);
-    this.removeErrorById(error_id);
+    this.deleteOriginWordById(error_id);
   }
 
   /**
@@ -98,7 +113,7 @@ export class ErrorParagraphsRepository {
    * @return {ReadonlyArray<ErrorsInParagraph>} 해결된 외래어 단락 목록
    */
   public getResolvedErrors(): ReadonlyArray<ErrorDetail> {
-    return Array.from(this.resolvedErrorParagraphsMap.values());
+    return Array.from(this.resolvedErrorsMap.values());
   }
 
   /**
@@ -106,7 +121,7 @@ export class ErrorParagraphsRepository {
    */
   public clearErrorParagraphs(): void {
     this.errorParagraphsMap.clear();
-    this.resolvedErrorParagraphsMap.clear();
+    this.resolvedErrorsMap.clear();
     this._notify();
   }
   /**

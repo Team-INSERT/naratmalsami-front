@@ -87,6 +87,14 @@ export class DocumentManager {
     DocumentManager.documentService.setPreviousDocuments(editedDocument);
   }
 
+  public deleteOriginWordById(error_id: string) {
+    DocumentManager.documentService.deleteOriginWordById(error_id);
+  }
+
+  public deleteRefinedWordById(refine_id: string) {
+    DocumentManager.documentService.deleteRefinedWordById(refine_id);
+  }
+
   // for React
   /**
    * 리스너를 구독하여 문서 변경 시 알림을 받을 수 있습니다. React 컴포넌트에서 사용됩니다.

@@ -105,6 +105,23 @@ export class DocumentService {
   }
 
   /**
+   * 외래어 단어를 삭제합니다. (레포지터리 내에서만)
+   * @param error_id 삭제할 외래어의 ID
+   * @returns 삭제된 문서
+   */
+  public deleteOriginWordById(error_id: string) {
+    this.errorParagraphsRepository.deleteOriginWordById(error_id);
+  }
+
+  /**
+   * 교정된 외래어 단어를 삭제합니다. (레포지터리 내에서만)
+   * @param refine_id 삭제할 외래어의 ID
+   */
+  public deleteRefinedWordById(refine_id: string) {
+    this.errorParagraphsRepository.deleteRefinedWordById(refine_id);
+  }
+
+  /**
    * 특정 외래어 단어를 교정 단어로 대체합니다.
    * @param error 외래어 상세 정보
    * @returns 교정이 반영된 복제 문서

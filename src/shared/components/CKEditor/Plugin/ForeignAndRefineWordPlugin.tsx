@@ -1,9 +1,11 @@
+import { DocumentManager } from "@/shared/stores/DocumentManager";
 import { Plugin, Editor } from "ckeditor5";
 
 export class ForeignWordPlugin extends Plugin {
   private wordId: string = "originid";
   private className: string = "__origin_word__";
   private observer: MutationObserver | null = null;
+  protected documentManager = new DocumentManager();
 
   constructor(editor: Editor, wordId: string = "originid", className: string = "__origin_word__") {
     super(editor);
@@ -35,13 +37,14 @@ export class ForeignWordPlugin extends Plugin {
     }
   }
 
-  private _observeMutations(editable: HTMLElement) {
+  protected _observeMutations(editable: HTMLElement) {
     this.observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         if (mutation.type === "characterData") {
           const span = mutation.target?.parentElement;
           if (span?.tagName === "SPAN" && span.hasAttribute(this.wordId)) {
             // Find the corresponding model range and remove the attribute from the model
+            this._deleteWordById(span.getAttribute(this.wordId) as string);
             const view = this.editor.editing.view;
             const domConverter = view.domConverter;
             const viewElement = domConverter.mapDomToView(span);
@@ -68,6 +71,10 @@ export class ForeignWordPlugin extends Plugin {
       childList: true,
       subtree: true,
     });
+  }
+  protected _deleteWordById(error_id: string) {
+    this.documentManager.deleteOriginWordById(error_id);
+    console.log(`Deleted word with ID: ${error_id}`);
   }
 
   private _defineSchema() {
@@ -112,5 +119,12 @@ export class ForeignWordPlugin extends Plugin {
 export class RefinedWordPlugin extends ForeignWordPlugin {
   constructor(editor: Editor) {
     super(editor, "refineid", "__refine_word__");
+  }
+  protected _deleteWordById(error_id: string) {
+    // this.documentManager.deleteRefinedWordById(error_id);
+    console.log(`Deleted refined word with ID: ${error_id}`);
+  }
+  protected _observeMutations(editable: HTMLElement) {
+    return;
   }
 }
