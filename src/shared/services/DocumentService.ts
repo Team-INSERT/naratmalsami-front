@@ -203,4 +203,13 @@ export class DocumentService {
   public getResolvedErrors(): ReadonlyArray<ErrorDetail> {
     return this.errorParagraphsRepository.getResolvedErrors();
   }
+
+    /**
+   * 외래어를 Error Id로 검색합니다.
+   * @param error_id 외래어 단락의 Error Id
+   * @returns 외래어 단락 정보 (없으면 undefined)
+   */
+  public getErrorByErrorId(error_id: string): ErrorDetail | undefined {
+    return this.errorParagraphsRepository.getErrorByErrorId(error_id);
+  }
 }

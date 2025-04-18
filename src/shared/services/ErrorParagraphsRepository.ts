@@ -136,6 +136,22 @@ export class ErrorParagraphsRepository {
     );
   }
 
+  /**
+   * 외래어를 Error Id로 검색합니다.
+   * @param error_id 외래어 단락의 Error Id
+   * @returns 외래어 단락 정보 (없으면 undefined)
+   */
+  public getErrorByErrorId(error_id: string): ErrorDetail | undefined {
+    let foundError: ErrorDetail | undefined = undefined;
+    Array.from(this.errorParagraphsMap.values()).forEach((errorParagraph) => {
+      const error = errorParagraph.errors.find((e) => e.error_id === error_id);
+      if (error) {
+        foundError = error;
+      }
+    });
+    return foundError;
+  }
+
   // For React
   /**
    * 외래어 단락 목록 업데이트 시 호출될 콜백 함수의 배열입니다.
