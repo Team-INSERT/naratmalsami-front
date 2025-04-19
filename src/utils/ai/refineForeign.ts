@@ -51,7 +51,7 @@ export async function* refineForeign(inputData: string[]) {
         target_id: difyResponse.target_id,
         errors: Object.entries(difyResponse.refineWord)
           .map(([origin_word, refine_word]) => {
-            const index = foreignSentence.foreignWord.indexOf(origin_word);
+            const index = foreignSentence.fullsentence.indexOf(origin_word);
             if (index === -1) {
               return;
             }
@@ -59,7 +59,7 @@ export async function* refineForeign(inputData: string[]) {
               code: 1,
               origin_word,
               refine_word,
-              index: foreignSentence.fullsentence.indexOf(origin_word),
+              index,
             };
           })
           .filter((error) => error !== undefined),
