@@ -153,10 +153,7 @@ export class DocumentService {
   ): Promise<void> {
     for await (const refinement of aiRefinements) {
       const errorsInParagraph: ErrorsInParagraph = {
-        errors: refinement.errors.map((errorItem) => ({
-          ...errorItem,
-          error_id: generateUniqueId(Prefix.ERROR),
-        })),
+        errors: refinement.errors,
         target_id: refinement.target_id,
         errorParagraph_id: generateUniqueId(Prefix.PARAGRAPH_ERROR),
       };
@@ -204,7 +201,7 @@ export class DocumentService {
     return this.errorParagraphsRepository.getResolvedErrors();
   }
 
-    /**
+  /**
    * 외래어를 Error Id로 검색합니다.
    * @param error_id 외래어 단락의 Error Id
    * @returns 외래어 단락 정보 (없으면 undefined)
