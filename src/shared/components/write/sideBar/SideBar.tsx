@@ -9,8 +9,13 @@ const error_description = ["", "불필요한 외래어 사용"];
 export default function SideBar() {
   const documentManager = React.useMemo(() => new DocumentManager(), []);
   const [selectedErrorId, setSelectedErrorId] = useState("");
-  const [errorParagraphs, setErrorParagraphs] = useState(documentManager.getErrorParagraphs());
-  const [resolvedErrors, setResolvedErrors] = useState(documentManager.getResolvedErrors());
+  const [errorParagraphs, setErrorParagraphs] = useState(
+    documentManager.getErrorParagraphs()
+  );
+  const [resolvedErrors, setResolvedErrors] = useState(
+    documentManager.getResolvedErrors()
+  );
+
   React.useEffect(() => {
     console.log("subscription");
     const unsubscribe = documentManager.subscribe(() => {
@@ -40,10 +45,12 @@ export default function SideBar() {
                   <OpenListItem
                     key={error.error_id}
                     errorDetail={error}
+                    target_id={errorsInParagraph.target_id}
                     description={error_description[error.code]}
                     error_id={error.error_id}
                     onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                      if ((e.target as HTMLElement).tagName === "BUTTON") return;
+                      if ((e.target as HTMLElement).tagName === "BUTTON")
+                        return;
                       setSelectedErrorId("");
                     }}
                   />
@@ -62,7 +69,12 @@ export default function SideBar() {
             ));
           })}
           {resolvedErrors.map((resolvedError) => {
-            return <RefinedItem key={resolvedError.error_id} errorDetail={resolvedError} />;
+            return (
+              <RefinedItem
+                key={resolvedError.error_id}
+                errorDetail={resolvedError}
+              />
+            );
           })}
         </SideBarMain>
       </SideBarBox>
