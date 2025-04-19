@@ -3,6 +3,7 @@ import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import DecoupledEditor from "@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor";
 import replaceSubstring from "@/utils/replaceSubstring";
 import { ErrorParagraphsRepository } from "./ErrorParagraphsRepository";
+import { HtmlProcessor } from "@/utils/HtmlProcessor";
 
 export interface EditorRef {
   current: DecoupledEditor | null;
@@ -39,12 +40,17 @@ export class DocumentService {
    * @param index 검사할 인덱스
    * @returns 단어 존재 여부 (boolean)
    */
-  private _doesWordExistAtIndex(text: string, word: string, index: number): boolean {
-    const existsAtIndex = text.slice(index, index + word.length) === word;
-    if (!existsAtIndex) {
-      console.error(`Word "${word}" does not exist at index ${index} in the text.\nText: ${text}`);
+  private _findWordIndex(text: string, word: string, index: number): number {
+    if (text.slice(index, index + word.length) === word) return index;
+    else {
+      const foundIndex = text.indexOf(word);
+      if (foundIndex !== -1) {
+        console.warn(`Word "${word}" found at index ${foundIndex} in the text.`);
+      } else {
+        console.error(`Word "${word}" not found in the text.`);
+      }
+      return foundIndex;
     }
-    return existsAtIndex;
   }
 
   /**
@@ -69,23 +75,43 @@ export class DocumentService {
     const sortedErrors = [...errors].sort((a, b) => a.index - b.index);
     let additionalIndex = 0;
 
+    let flag = false;
     for (const errorDetail of sortedErrors) {
       const adjustedIndex = errorDetail.index + additionalIndex;
 
-      if (this._doesWordExistAtIndex(currentHTML, errorDetail.origin_word, adjustedIndex)) {
-        this.errorParagraphsRepository.addErrorParagraphs([errorsInParagraph]);
+      const foundIndex = this._findWordIndex(currentHTML, errorDetail.origin_word, adjustedIndex);
+
+      if (foundIndex !== -1) {
+        flag = true;
         const errorId = errorDetail.error_id;
         const wrappedWord = this._createErrorSpan(errorId, errorDetail.origin_word);
 
         currentHTML = replaceSubstring(
           currentHTML,
-          adjustedIndex,
-          adjustedIndex + errorDetail.origin_word.length,
+          foundIndex,
+          foundIndex + errorDetail.origin_word.length,
           wrappedWord
         );
 
         additionalIndex += wrappedWord.length - errorDetail.origin_word.length;
       }
+    }
+    if (flag) {
+      const existingErrorParagraph = this.errorParagraphsRepository.getErrorParagraphById(
+        errorsInParagraph.target_id
+      );
+      if (existingErrorParagraph) {
+        const clonedDocument = this._getClonedDocument();
+        existingErrorParagraph.errors.map((error) => {
+          const element = clonedDocument.querySelector(`[originid="${error.error_id}"]`);
+          element?.removeAttribute("originid");
+          console.log("element", element);
+        });
+        this._setDocumentToEditor(clonedDocument);
+        this.errorParagraphsRepository.deleteErrorParagraph(existingErrorParagraph);
+      }
+
+      this.errorParagraphsRepository.addErrorParagraphs([errorsInParagraph]);
     }
     element.innerHTML = currentHTML;
   }
@@ -158,8 +184,6 @@ export class DocumentService {
         errorParagraph_id: generateUniqueId(Prefix.PARAGRAPH_ERROR),
       };
 
-      // this.errorParagraphsRepository.addErrorParagraphs([errorsInParagraph]);
-
       const processedDocument = await this.bindErrorsToElement(errorsInParagraph);
       this._setDocumentToEditor(processedDocument);
     }
@@ -169,8 +193,12 @@ export class DocumentService {
    * 복제된 문서의 내용을 에디터에 반영합니다.
    * @param document 반영할 Document 객체
    */
-  private _setDocumentToEditor(document: Document): void {
-    this.editorRef.current?.setData(document.querySelector(".ck-content")?.innerHTML as string);
+  private _setDocumentToEditor(document: Document, isTriggingDocumentChangeEvent = false): void {
+    const ckEditorContentString = document.querySelector(".ck-content")?.innerHTML as string;
+    this.editorRef.current?.setData(ckEditorContentString);
+    if (!isTriggingDocumentChangeEvent) {
+      this.setPreviousDocuments(new HtmlProcessor().processHtmlDocument(ckEditorContentString));
+    }
   }
 
   /**

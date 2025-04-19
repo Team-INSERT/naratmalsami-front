@@ -19,6 +19,12 @@ export class ErrorParagraphsRepository {
    */
   public addErrorParagraphs(errorParagraphs: ReadonlyArray<ErrorsInParagraph>): void {
     for (const errorParagraph of errorParagraphs) {
+      const existingErrorParagraph = this.errorParagraphsMap.get(errorParagraph.target_id);
+      if (existingErrorParagraph) {
+        console.warn(
+          `Error paragraph with target_id ${errorParagraph.target_id} already exists.\nwill be replaced.`
+        );
+      }
       this.errorParagraphsMap.set(errorParagraph.target_id, errorParagraph);
     }
     this._notify();
@@ -33,20 +39,11 @@ export class ErrorParagraphsRepository {
 
   /**
    * 외래어 단락을 외래어 단락 ID로 제거합니다.
-   * @param errorParagraphId 외래어 단락 ID
+   * @param targetId 외래어 단락 ID
    */
-  public resolveErrorParagraphById(errorParagraphId: string): void {
-    if (!errorParagraphId) throw new Error("errorParagraphId is undefined");
-    // Find the entry with the given errorParagraph_id
-    const entry = Array.from(this.errorParagraphsMap.values()).find(
-      (errorParagraph) => errorParagraph.errorParagraph_id === errorParagraphId
-    );
-    if (!entry) throw new Error(`errorParagraphId ${errorParagraphId} not found`);
+  public deleteErrorParagraph(entry: ErrorsInParagraph): void {
+    if (!entry) throw new Error("entry is undefined");
     this.errorParagraphsMap.delete(entry.target_id);
-    this.resolvedErrorsMap.set(
-      entry.target_id,
-      entry.errors.find((e) => e.error_id === entry.errorParagraph_id) as ErrorDetail
-    );
     this._notify();
   }
   /**
