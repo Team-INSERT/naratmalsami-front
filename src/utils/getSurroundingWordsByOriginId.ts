@@ -1,6 +1,7 @@
 export default function getSurroundingWordsByOriginId(targetId : string, originId : string, count = 3) {
-  const editor = document.querySelectorAll(".ck-content")[0];
-
+  const editors = document.querySelectorAll(".ck-content");
+  if (editors.length === 0) return { before: [], after: [] };
+  const editor = editors[0];
   const p = editor.querySelector(`p[data-unique="${targetId}"]`);
 
   if (!p) return { before: [], after: [] };
