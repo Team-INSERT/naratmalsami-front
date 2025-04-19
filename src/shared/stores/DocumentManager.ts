@@ -81,13 +81,20 @@ export class DocumentManager {
       editedDocument
     );
 
+    if (modifiedElements[0] == undefined) {
+      DocumentManager.documentService.setPreviousDocuments([]);
+      return;
+    }
+
     console.debug("Modified Elements:", modifiedElements);
     console.debug("CurrentDocument:", documentContext);
+    console.debug("PreviousDocument:", previousDocument);
+    console.debug("editedDocument:", editedDocument);
 
+    DocumentManager.documentService.setPreviousDocuments(editedDocument);
     await DocumentManager.documentService.handleAiRefinement(
       AiService.fetchAiRefinementsLocal(modifiedElements)
     );
-    DocumentManager.documentService.setPreviousDocuments(editedDocument);
   }
 
   public deleteOriginWordById(error_id: string) {
