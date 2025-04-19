@@ -3,13 +3,16 @@ import loanword from "/public/images/icon/loanword.svg";
 import * as All from "./ErrorListItem";
 import { DocumentManager } from "@/shared/stores/DocumentManager";
 import { ErrorDetail } from "@/shared/stores/error";
+import { useEffect, useState } from "react";
+import getSurroundingWordsByOriginId from "@/utils/getSurroundingWordsByOriginId";
 
 const documentManager = new DocumentManager();
 interface OpenListItemProps {
   errorDetail: ErrorDetail;
   description: string;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  error_id?: string;
+  error_id: string;
+  target_id: string;
 }
 
 export default function OpenListItem({
@@ -17,7 +20,23 @@ export default function OpenListItem({
   description,
   onClick,
   error_id,
+  target_id,
 }: OpenListItemProps) {
+  const [surroundingWords, setSurroundingWords] = useState({
+    after: "",
+    before: "",
+  });
+
+  useEffect(() => {
+    const { after, before } = getSurroundingWordsByOriginId(
+      target_id,
+      error_id,
+      3
+    );
+    console.log(after, before);
+    setSurroundingWords({ after: after.join(" "), before: before.join(" ") });
+  }, []);
+
   return (
     <>
       <OpenListItemBox onClick={onClick}>
@@ -28,15 +47,16 @@ export default function OpenListItem({
             <All.ContextBox>
               <All.Description>{description}</All.Description>
               <All.Text>
-                {errorDetail.origin_word} → <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
+                {errorDetail.origin_word} →{" "}
+                <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
               </All.Text>
             </All.ContextBox>
           </All.ListContentBox>
           <RefineBox>
-            <RefineTest>나는 이 일을</RefineTest>
+            <RefineTest>{surroundingWords.before}</RefineTest>
             <DeleteText>{errorDetail.origin_word}</DeleteText>
             <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
-            <RefineTest>할 수 있어</RefineTest>
+            <RefineTest>{surroundingWords.after}</RefineTest>
           </RefineBox>
           <Buttons>
             <RefineButton>
@@ -99,7 +119,7 @@ const RefineBox = styled.div`
   padding: 4px 8px;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   border-radius: 4px;
   background: #f8fbfc;
 `;
