@@ -87,7 +87,6 @@ import "ckeditor5/ckeditor5.css";
 import "./style.css";
 // import { useDocument } from "@/shared/stores/useDocument";
 import { DocumentManager } from "@/shared/stores/DocumentManager";
-import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import * as S from "./WriteHeader/style";
 import Timer from "tiny-timer";
 import { ForeignWordPlugin, RefinedWordPlugin } from "./Plugin/ForeignAndRefineWordPlugin";
