@@ -81,6 +81,9 @@ export class DocumentManager {
       editedDocument
     );
 
+    console.debug("Modified Elements:", modifiedElements);
+    console.debug("CurrentDocument:", documentContext);
+
     await DocumentManager.documentService.handleAiRefinement(
       AiService.fetchAiRefinementsLocal(modifiedElements)
     );
@@ -120,7 +123,7 @@ export class DocumentManager {
     return DocumentManager.documentService.getResolvedErrors();
   }
 
-    /**
+  /**
    * 외래어를 Error Id로 검색합니다.
    * @param error_id 외래어 단락의 Error Id
    * @returns 외래어 단락 정보 (없으면 undefined)
