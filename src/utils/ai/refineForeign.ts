@@ -25,7 +25,7 @@ export async function* refineForeign(inputData: string[]) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const content = doc.body.textContent || "";
-    const target_id = doc.body.querySelector("p")?.getAttribute("data-unique") as string;
+    const target_id = doc.querySelector("[data-unique]")?.getAttribute("data-unique") as string;
 
     const { foreignWords, sentenceList } = await findForeignWord(content);
 
