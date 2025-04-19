@@ -123,19 +123,6 @@ export default function CKEditorComponent() {
     updated_at: "",
   });
 
-  function grantDataUnique() {
-    const parentDiv = document.querySelector(".ck-editor__editable");
-
-    if (parentDiv) {
-      // Only select direct children using :scope > *
-      parentDiv.querySelectorAll(":scope > *").forEach((el) => {
-        if (!el.hasAttribute("data-unique")) {
-          el.setAttribute("data-unique", generateUniqueId(Prefix.UNIQUE));
-        }
-      });
-    }
-  }
-
   function getParent() {
     const parentDiv = document.querySelector(".ck-editor__editable");
     if (parentDiv) {
@@ -149,7 +136,6 @@ export default function CKEditorComponent() {
 
     // 에디터 미사용 액션
     timer.on("done", () => {
-      grantDataUnique();
       const currentVirtualData = getParent() || "";
       documentManager.handleDocumentModifications(currentVirtualData);
     });
@@ -434,7 +420,6 @@ export default function CKEditorComponent() {
             <div className="editor-container__editor-wrapper">
               <div className="editor-container__editor">
                 <div>
-
                   {isLayoutReady && editorConfig && (
                     <HoverTracker>
                       <CKEditor
