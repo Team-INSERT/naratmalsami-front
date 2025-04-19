@@ -23,7 +23,7 @@ git subtree split --prefix=src/ai -b $SPLIT_BRANCH
 # 메인 브랜치로 돌아와서 subtree pull
 echo "📥 Pulling subtree into $SUBTREE_PREFIX..."
 git switch -
-git subtree pull --prefix=$SUBTREE_PREFIX $REMOTE_REPO $SPLIT_BRANCH --squash
+git subtree pull --prefix=$SUBTREE_PREFIX $REMOTE_REPO $SPLIT_BRANCH
 
 # package.json 복사
 echo "📦 Copying package.json from remote repo root..."
