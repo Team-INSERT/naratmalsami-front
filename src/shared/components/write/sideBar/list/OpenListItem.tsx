@@ -125,6 +125,7 @@ const RefineBox = styled.div`
 `;
 
 const RefineTest = styled.span`
+  white-space: nowrap;
   color: #2b2b2b;
   font-family: "Noto Sans KR";
   font-size: 16px;
@@ -133,11 +134,15 @@ const RefineTest = styled.span`
   line-height: normal;
 `;
 const DeleteText = styled(RefineTest)`
+  white-space: nowrap;
+
   color: #afb1c3;
   text-decoration: line-through;
 `;
 
 const RefinedText = styled(RefineTest)`
+  white-space: nowrap;
+
   color: #05a569;
 `;
 
