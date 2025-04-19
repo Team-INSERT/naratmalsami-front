@@ -62,6 +62,17 @@ export class ForeignWordPlugin extends Plugin {
             }
           }
         }
+        if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
+          mutation.removedNodes.forEach((node) => {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).tagName === "SPAN" &&
+              (node as HTMLElement).hasAttribute(this.wordId)
+            ) {
+              this._deleteWordById((node as HTMLElement).getAttribute(this.wordId) as string);
+            }
+          });
+        }
       }
     });
 
