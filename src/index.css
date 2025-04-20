@@ -32,3 +32,9 @@ body {
 #root > div > div > section > div.editor-container-section > div.editor-container__editor-wrapper {
 	height: 100%;
 }
+
+.main-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+}
