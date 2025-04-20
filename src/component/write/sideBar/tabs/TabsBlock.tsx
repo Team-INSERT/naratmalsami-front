@@ -47,13 +47,14 @@ const Text = styled.span`
 `;
 const Value = styled.div`
   display: flex;
-  padding: 2px 6px;
-  flex-direction: column;
+  width: 24px;
+  height: 24px;
   justify-content: center;
   align-items: center;
   border-radius: 999px;
   background: #05a569;
   box-shadow: 0px 4px 41.2px 0px rgba(5, 165, 105, 0.05);
+  line-height: 16px;
 `;
 const ValueText = styled.span`
   color: #fff;
@@ -61,5 +62,4 @@ const ValueText = styled.span`
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
-  line-height: 19.2px;
 `;
