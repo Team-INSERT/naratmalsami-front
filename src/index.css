@@ -1,14 +1,34 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap");
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: "Noto Sans KR", "Pretendard", sans-serif;
+	margin: 0;
+	min-width: 320px;
+	min-height: 100vh;
+	font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
 }
 
 .__origin_word__ {
-  background: rgba(255, 94, 94, 0.24);
-  border-bottom: 2px solid #FF5E5E;
+	background: rgba(255, 94, 94, 0.24);
+	border-bottom: 2px solid #ff5e5e;
+}
+
+@keyframes flash {
+	0% {
+		background: #ffe066;
+	}
+	100% {
+		background: transparent;
+	}
+}
+
+.flash-highlight {
+	animation: flash 2s ease-out forwards;
+}
+
+#root > div > div > section {
+	height: 100%;
+}
+#root > div > div > section > div.editor-container-section > div.editor-container__editor-wrapper {
+	height: 100%;
 }
