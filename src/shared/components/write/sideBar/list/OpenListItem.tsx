@@ -26,15 +26,24 @@ export default function OpenListItem({
     after: "",
     before: "",
   });
+  
+  const [errorDetailAndJosa, setErrorDetailAndJosa] = useState({
+    after: errorDetail.refine_word[0],
+    before: errorDetail.origin_word,
+  });
 
   useEffect(() => {
-    const { after, before } = getSurroundingWordsByOriginId(
+    const { after, before, josaDetail } = getSurroundingWordsByOriginId(
       target_id,
       error_id,
-      3
+      errorDetail.refine_word[0]
     );
     console.log(after, before);
     setSurroundingWords({ after: after.join(" "), before: before.join(" ") });
+    setErrorDetailAndJosa({
+      after: errorDetail.refine_word[0] + (josaDetail?.afterJosa || ""),
+      before: errorDetail.origin_word + (josaDetail?.beforeJosa || ""),
+    });
   }, []);
 
   return (
@@ -54,8 +63,8 @@ export default function OpenListItem({
           </All.ListContentBox>
           <RefineBox>
             <RefineTest>{surroundingWords.before}</RefineTest>
-            <DeleteText>{errorDetail.origin_word}</DeleteText>
-            <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
+            <DeleteText>{errorDetailAndJosa.before}</DeleteText>
+            <RefinedText>{errorDetailAndJosa.after}</RefinedText>
             <RefineTest>{surroundingWords.after}</RefineTest>
           </RefineBox>
           <Buttons>
