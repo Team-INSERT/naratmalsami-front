@@ -30,8 +30,8 @@ export default function getSurroundingWordsByOriginId(
   if (!textContent) return { before: [], after: [] };
 
   // 조사 찾기
-  let afterJosa: string | null = null;
   let beforeJosa: string | null = null;
+  let afterJosa: string | null = null;
 
   if (considerJosa) {
     const markerIndex = textContent.indexOf(MARKER);
@@ -41,15 +41,15 @@ export default function getSurroundingWordsByOriginId(
     const nextSpaceIndex = textContent.substring(startIndex).indexOf(" ");
 
     if (nextSpaceIndex > -1) {
-      afterJosa = textContent
+      beforeJosa = textContent
       .substring(startIndex, startIndex + nextSpaceIndex)
       .replace(/<[^>]*>/g, "");
     } else {
-      afterJosa = textContent.substring(startIndex).replace(/<[^>]*>/g, "");
+      beforeJosa = textContent.substring(startIndex).replace(/<[^>]*>/g, "");
     }
-    if (afterJosa === "") afterJosa = null;
-    if (afterJosa) {
-      beforeJosa = translateJosa(refinedWord as string, afterJosa);
+    if (beforeJosa === "") beforeJosa = null;
+    if (beforeJosa) {
+      afterJosa = translateJosa(refinedWord as string, beforeJosa);
     }
   }
 
@@ -60,11 +60,11 @@ export default function getSurroundingWordsByOriginId(
 
   if (considerJosa) {
     // 문장 뒤에 변경해야할 조사가 존재한다면 after에서 조사 원소를 삭제
-    if (!!afterJosa && after[0] === afterJosa && afterJosa !== beforeJosa) {
+    if (!!beforeJosa && after[0] === beforeJosa && beforeJosa !== afterJosa) {
       after.shift();
     }else{
-      afterJosa = null;
       beforeJosa = null;
+      afterJosa = null;
     }
   }
 
@@ -72,8 +72,8 @@ export default function getSurroundingWordsByOriginId(
     before: tokens.slice(Math.max(0, idx - count), idx),
     after: after,
     josaDetail: {
-      beforeJosa: afterJosa,
-      afterJosa: beforeJosa,
+      beforeJosa: beforeJosa,
+      afterJosa: afterJosa,
     },
   };
 }
