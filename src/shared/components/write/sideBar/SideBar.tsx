@@ -36,7 +36,7 @@ export default function SideBar() {
 	React.useEffect(() => {
 		if (!selectedErrorId) return;
 		const container = document.querySelector<HTMLElement>(EDITOR_CONTAINER_SELECTOR);
-		const target = document.querySelector<HTMLSpanElement>(`span[originid="${selectedErrorId}"]`);
+		const target = document.querySelector<HTMLElement>(`span[originid="${selectedErrorId}"], span[refineid="${selectedErrorId}"]`);
 		if (!container || !target) return;
 
 		const targetOffset = target.offsetTop - container.offsetTop - container.clientHeight / 2 + target.clientHeight / 2;
@@ -84,7 +84,15 @@ export default function SideBar() {
 						));
 					})}
 					{resolvedErrors.map((resolvedError) => {
-						return <RefinedItem key={resolvedError.error_id} errorDetail={resolvedError} />;
+						return (
+							<RefinedItem
+								key={resolvedError.error_id}
+								errorDetail={resolvedError}
+								onClick={() => {
+									setSelectedErrorId(resolvedError.error_id);
+								}}
+							/>
+						);
 					})}
 				</SideBarMain>
 			</SideBarBox>
