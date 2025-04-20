@@ -1,9 +1,14 @@
-import { ErrorsInParagraph, ErrorDetail, ErrorsInParagraphData } from "@/shared/stores/error";
+import {
+  ErrorsInParagraph,
+  ErrorDetail,
+  ErrorsInParagraphData,
+} from "@/shared/stores/error";
 import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 import DecoupledEditor from "@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor";
 import replaceSubstring from "@/utils/replaceSubstring";
 import { ErrorParagraphsRepository } from "./ErrorParagraphsRepository";
 import { HtmlProcessor } from "@/utils/HtmlProcessor";
+import translateJosa from "@/utils/josa/translateJosa";
 
 export interface EditorRef {
   current: DecoupledEditor | null;
@@ -15,7 +20,8 @@ export interface EditorRef {
 export class DocumentService {
   private editorRef: EditorRef = { current: null };
   private previousDocuments: string[] = [];
-  private errorParagraphsRepository: ErrorParagraphsRepository = new ErrorParagraphsRepository();
+  private errorParagraphsRepository: ErrorParagraphsRepository =
+    new ErrorParagraphsRepository();
 
   /**
    * 에디터 참조를 초기화합니다.
@@ -45,7 +51,9 @@ export class DocumentService {
     else {
       const foundIndex = text.indexOf(word);
       if (foundIndex !== -1) {
-        console.warn(`Word "${word}" found at index ${foundIndex} in the text.`);
+        console.warn(
+          `Word "${word}" found at index ${foundIndex} in the text.`
+        );
       } else {
         console.error(`Word "${word}" not found in the text.`);
       }
@@ -68,7 +76,10 @@ export class DocumentService {
    * @param element 대상 요소
    * @param errorsInParagraph 외래어 정보가 포함된 단락 데이터
    */
-  private _processErrorsInElement(element: Element, errorsInParagraph: ErrorsInParagraph): void {
+  private _processErrorsInElement(
+    element: Element,
+    errorsInParagraph: ErrorsInParagraph
+  ): void {
     let currentHTML = element.innerHTML;
     const errors = errorsInParagraph.errors;
 
@@ -79,12 +90,19 @@ export class DocumentService {
     for (const errorDetail of sortedErrors) {
       const adjustedIndex = errorDetail.index + additionalIndex;
 
-      const foundIndex = this._findWordIndex(currentHTML, errorDetail.origin_word, adjustedIndex);
+      const foundIndex = this._findWordIndex(
+        currentHTML,
+        errorDetail.origin_word,
+        adjustedIndex
+      );
 
       if (foundIndex !== -1) {
         flag = true;
         const errorId = errorDetail.error_id;
-        const wrappedWord = this._createErrorSpan(errorId, errorDetail.origin_word);
+        const wrappedWord = this._createErrorSpan(
+          errorId,
+          errorDetail.origin_word
+        );
 
         currentHTML = replaceSubstring(
           currentHTML,
@@ -97,18 +115,23 @@ export class DocumentService {
       }
     }
     if (flag) {
-      const existingErrorParagraph = this.errorParagraphsRepository.getErrorParagraphById(
-        errorsInParagraph.target_id
-      );
+      const existingErrorParagraph =
+        this.errorParagraphsRepository.getErrorParagraphById(
+          errorsInParagraph.target_id
+        );
       if (existingErrorParagraph) {
         const clonedDocument = this._getClonedDocument();
         existingErrorParagraph.errors.map((error) => {
-          const element = clonedDocument.querySelector(`[originid="${error.error_id}"]`);
+          const element = clonedDocument.querySelector(
+            `[originid="${error.error_id}"]`
+          );
           element?.removeAttribute("originid");
           console.log("element", element);
         });
         this._setDocumentToEditor(clonedDocument);
-        this.errorParagraphsRepository.deleteErrorParagraph(existingErrorParagraph);
+        this.errorParagraphsRepository.deleteErrorParagraph(
+          existingErrorParagraph
+        );
       }
 
       this.errorParagraphsRepository.addErrorParagraphs([errorsInParagraph]);
@@ -123,10 +146,15 @@ export class DocumentService {
    */
   async bindErrorsToElement(errorData: ErrorsInParagraph): Promise<Document> {
     const clonedDocument = this._getClonedDocument();
-    const targetElement = clonedDocument.querySelector(`[data-unique="${errorData.target_id}"]`);
+    const targetElement = clonedDocument.querySelector(
+      `[data-unique="${errorData.target_id}"]`
+    );
 
     if (targetElement) this._processErrorsInElement(targetElement, errorData);
-    else throw new Error(`Element with data-unique="${errorData.target_id}" not found.`);
+    else
+      throw new Error(
+        `Element with data-unique="${errorData.target_id}" not found.`
+      );
     return clonedDocument;
   }
 
@@ -148,26 +176,67 @@ export class DocumentService {
   }
 
   /**
+   * @description
+   * 주어진 요소(el) 바로 뒤에 붙은 조사(originJosa)를 추출해
+   * translateJosa로 교정된 조사로 대체한다.
+   */
+  private _adjustJosaAfterElement(el: HTMLElement): void {
+    const next = el.nextSibling;
+    if (!next) return;
+
+    const rawText = next.textContent ?? "";
+    // 공백-only 노드면 무시
+    if (/^\s+$/.test(rawText)) return;
+
+    // 첫 공백 전까지를 원조사로
+    const match = rawText.match(/^(\S+)/);
+    if (!match) return;
+
+    const [originalJosa] = match;
+    const corrected = translateJosa(el.textContent!, originalJosa);
+    if (!corrected || corrected === originalJosa) return;
+
+    // 앞공백 유지 + 교정된 조사 + 나머지 텍스트
+    const leadingSpaces = rawText.slice(
+      0,
+      rawText.indexOf(rawText.trimStart())
+    );
+    const rest = rawText.slice(leadingSpaces.length + originalJosa.length);
+    const newText = leadingSpaces + corrected + rest;
+
+    if (next.nodeType === Node.TEXT_NODE) {
+      next.textContent = newText;
+    } else if (next.nodeType === Node.ELEMENT_NODE) {
+      (next as HTMLElement).textContent = newText;
+    }
+  }
+
+  /**
    * 특정 외래어 단어를 교정 단어로 대체합니다.
    * @param error 외래어 상세 정보
    * @returns 교정이 반영된 복제 문서
    */
   public resolveError(error: ErrorDetail): Document {
-    const clonedDocument = this._getClonedDocument();
-    const targetElement = clonedDocument.querySelector(`[originid="${error.error_id}"]`);
+    const clonedDoc = this._getClonedDocument();
+    const targetEl = clonedDoc.querySelector<HTMLElement>(
+      `[originid="${error.error_id}"]`
+    );
 
-    if (targetElement) {
-      targetElement.innerHTML = error.refine_word[0];
-      this.errorParagraphsRepository.resolveErrorById(error.error_id);
-      console.log(targetElement);
-      targetElement?.removeAttribute("originid");
-      targetElement?.setAttribute("refineid", error.error_id);
-      this._setDocumentToEditor(clonedDocument);
-    } else {
+    if (!targetEl) {
       console.error(`Element with originid="${error.error_id}" not found.`);
+      return clonedDoc;
     }
 
-    return clonedDocument;
+    targetEl.innerHTML = error.refine_word[0];
+    this.errorParagraphsRepository.resolveErrorById(error.error_id);
+
+    this._adjustJosaAfterElement(targetEl);
+
+    targetEl.removeAttribute("originid");
+    targetEl.setAttribute("refineid", error.error_id);
+    this._setDocumentToEditor(clonedDoc);
+
+    return clonedDoc;
   }
 
   /**
@@ -184,7 +253,9 @@ export class DocumentService {
         errorParagraph_id: generateUniqueId(Prefix.PARAGRAPH_ERROR),
       };
 
-      const processedDocument = await this.bindErrorsToElement(errorsInParagraph);
+      const processedDocument = await this.bindErrorsToElement(
+        errorsInParagraph
+      );
       this._setDocumentToEditor(processedDocument);
     }
   }
@@ -193,11 +264,17 @@ export class DocumentService {
    * 복제된 문서의 내용을 에디터에 반영합니다.
    * @param document 반영할 Document 객체
    */
-  private _setDocumentToEditor(document: Document, isTriggingDocumentChangeEvent = false): void {
-    const ckEditorContentString = document.querySelector(".ck-content")?.innerHTML as string;
+  private _setDocumentToEditor(
+    document: Document,
+    isTriggingDocumentChangeEvent = false
+  ): void {
+    const ckEditorContentString = document.querySelector(".ck-content")
+      ?.innerHTML as string;
     this.editorRef.current?.setData(ckEditorContentString);
     if (!isTriggingDocumentChangeEvent) {
-      this.setPreviousDocuments(new HtmlProcessor().processHtmlDocument(ckEditorContentString));
+      this.setPreviousDocuments(
+        new HtmlProcessor().processHtmlDocument(ckEditorContentString)
+      );
     }
   }
 
