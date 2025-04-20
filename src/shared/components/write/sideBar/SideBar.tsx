@@ -60,6 +60,16 @@ export default function SideBar() {
 
 		prevRef.current = { el: target, timer };
 	}, [selectedErrorId]);
+
+	React.useEffect(() => {
+		return () => {
+			if (prevRef.current.timer) clearTimeout(prevRef.current.timer);
+			if (prevRef.current.el) {
+				prevRef.current.el.classList.remove('flash-highlight');
+			}
+		};
+	}, []);
+
 	return (
 		<React.Fragment>
 			<SideBarBox>
