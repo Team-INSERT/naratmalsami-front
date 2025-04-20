@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import TabsBlock from './tabs/TabsBlock';
 import ListItem from './list/ErrorListItem';
 import OpenListItem from './list/OpenListItem';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { DocumentManager } from '@/shared/stores/DocumentManager';
 import RefinedItem from './list/RefinedItem';
 const error_description = ['', '불필요한 외래어 사용'];
@@ -14,6 +14,11 @@ export default function SideBar() {
 	const [selectedErrorId, setSelectedErrorId] = useState('');
 	const [errorParagraphs, setErrorParagraphs] = useState(documentManager.getErrorParagraphs());
 	const [resolvedErrors, setResolvedErrors] = useState(documentManager.getResolvedErrors());
+
+	const prevRef = useRef<{ el: HTMLElement | null; timer: number | null }>({
+		el: null,
+		timer: null,
+	});
 
 	React.useEffect(() => {
 		console.log('subscription');
@@ -36,18 +41,24 @@ export default function SideBar() {
 	React.useEffect(() => {
 		if (!selectedErrorId) return;
 		const container = document.querySelector<HTMLElement>(EDITOR_CONTAINER_SELECTOR);
-		const target = document.querySelector<HTMLElement>(`span[originid="${selectedErrorId}"], span[refineid="${selectedErrorId}"]`);
-		if (!container || !target) return;
+		if (!container) return;
+		const target = container.querySelector<HTMLElement>(`span[originid="${selectedErrorId}"], span[refineid="${selectedErrorId}"]`);
+		if (!target) return;
+
+		if (prevRef.current.timer) clearTimeout(prevRef.current.timer);
+		if (prevRef.current.el && prevRef.current.el !== target) {
+			prevRef.current.el.classList.remove('flash-highlight');
+		}
 
 		const targetOffset = target.offsetTop - container.offsetTop - container.clientHeight / 2 + target.clientHeight / 2;
 		container.scrollTo({ top: targetOffset, behavior: 'smooth' });
 
 		target.classList.add('flash-highlight');
-		const timer = setTimeout(() => {
+		const timer = window.setTimeout(() => {
 			target.classList.remove('flash-highlight');
 		}, HIGHLIGHT_DURATION);
 
-		return () => clearTimeout(timer);
+		prevRef.current = { el: target, timer };
 	}, [selectedErrorId]);
 	return (
 		<React.Fragment>
