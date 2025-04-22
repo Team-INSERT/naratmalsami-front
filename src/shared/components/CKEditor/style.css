@@ -6,7 +6,7 @@
 	}
 }
 
-body{
+body {
 	overflow: hidden;
 }
 
@@ -28,7 +28,7 @@ body{
 .editor-container__editor-wrapper {
 	display: flex;
 	justify-content: center;
-	width: 100dvw;
+	width: 100%;
 }
 
 .editor-container_document-editor {
@@ -81,9 +81,9 @@ body{
 	height: fit-content;
 	padding: 20mm 12mm;
 	background: hsl(0, 0%, 100%);
-	flex: 1 1 auto;
+	/* flex: 1 1 auto;
 	margin-left: 72px;
-	margin-right: 72px;
+	margin-right: 72px; */
 }
 
 .ck.ck-editor__editable:hover {
@@ -111,7 +111,7 @@ body{
 	box-shadow: none !important;
 }
 
-.editor-container__menu-bar > div{
+.editor-container__menu-bar > div {
 	gap: 1.5rem !important;
 }
 

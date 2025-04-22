@@ -4,11 +4,12 @@ import styled from "styled-components";
 interface ListItemProps {
   default: string;
   description: string;
+  onClick?: () => void;
 }
 
-export default function ListItem({ default: def, description }: ListItemProps) {
+export default function ListItem({ default: def, description, onClick }: ListItemProps) {
   return (
-    <ListItemBox>
+    <ListItemBox onClick={onClick}>
       <ListContentBox>
         <Loanword src={loanword} alt="loanword" />
         <ContextBox>
@@ -21,19 +22,14 @@ export default function ListItem({ default: def, description }: ListItemProps) {
 }
 
 export const ListItemBox = styled.div`
-  display: flex;
   width: 100%;
-  padding: 10px 6px;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid #e2e2e2;
+  padding: 10px 10px;
   background: #fff;
 `;
 
 export const ListContentBox = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
 `;

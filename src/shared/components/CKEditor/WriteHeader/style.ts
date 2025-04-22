@@ -9,3 +9,11 @@ export const WriteHeader = styled.header`
     text-align: center;
   }
 `; 
+
+export const WriteSection = styled.section`
+  display: flex;
+
+  .editor-container-section {
+    width: 70dvw;
+  }
+`;

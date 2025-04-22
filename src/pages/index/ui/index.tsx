@@ -1,5 +1,5 @@
-import React from "react";
-import SideBar from "@/component/write/sideBar/SideBar";
+import OverlayRecommendedBox from "@/shared/components/overlay/Box";
+import SideBar from "@/shared/components/write/sideBar/SideBar";
 
 const IndexPage = () => {
   const login = async () => {
