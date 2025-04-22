@@ -9,6 +9,19 @@ const error_description = ['', '불필요한 외래어 사용'];
 export default function SideBar() {
 	const HIGHLIGHT_DURATION = 2000;
 	const EDITOR_CONTAINER_SELECTOR = '.editor-container__editor-wrapper';
+  const documentManager = React.useMemo(() => new DocumentManager(), []);
+  const [selectedErrorId, setSelectedErrorId] = useState("");
+  const [errorParagraphs, setErrorParagraphs] = useState(
+    documentManager.getErrorParagraphs()
+  );
+
+  const count = errorParagraphs.reduce((acc, cur) => {
+    return acc + cur.errors.length;
+  }, 0);
+
+  const [resolvedErrors, setResolvedErrors] = useState(
+    documentManager.getResolvedErrors()
+  );
 
 	const documentManager = React.useMemo(() => new DocumentManager(), []);
 	const [selectedErrorId, setSelectedErrorId] = useState('');
@@ -74,7 +87,7 @@ export default function SideBar() {
 	return (
 		<React.Fragment>
 			<SideBarBox>
-				<TabsBlock />
+				<TabsBlock count={count} />
 				<SideBarMain>
 					{errorParagraphs.map((errorsInParagraph) => {
 						return errorsInParagraph.errors.map((error) => (
