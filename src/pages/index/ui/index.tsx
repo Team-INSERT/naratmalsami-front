@@ -1,4 +1,4 @@
-import React from "react";
+import OverlayRecommendedBox from "@/shared/components/overlay/Box";
 import SideBar from "@/shared/components/write/sideBar/SideBar";
 
 const IndexPage = () => {

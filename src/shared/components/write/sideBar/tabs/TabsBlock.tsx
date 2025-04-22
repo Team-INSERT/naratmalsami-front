@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export default function TabsBlock() {
+export default function TabsBlock({ count }: { count: number }) {
   return (
     <>
       <TabsBlockBox>
@@ -8,7 +8,7 @@ export default function TabsBlock() {
           <Content>
             <Text>다듬을 단어</Text>
             <Value>
-              <ValueText>14</ValueText>
+              <ValueText>{count}</ValueText>
             </Value>
           </Content>
         </BlockBox>
@@ -49,13 +49,15 @@ const Text = styled.span`
 `;
 const Value = styled.div`
   display: flex;
-  padding: 2px 6px;
-  flex-direction: column;
+  min-width: 1.25rem;
+  max-width: 2.25rem;
+  height: 1.5rem;
   justify-content: center;
   align-items: center;
-  border-radius: 999px;
+  border-radius: 1rem;
   background: #05a569;
   box-shadow: 0px 4px 41.2px 0px rgba(5, 165, 105, 0.05);
+  padding: 2px 4px;
 `;
 const ValueText = styled.span`
   color: #fff;

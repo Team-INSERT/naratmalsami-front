@@ -1,20 +1,51 @@
 import styled from "styled-components";
 import loanword from "/public/images/icon/loanword.svg";
 import * as All from "./ErrorListItem";
+import { DocumentManager } from "@/shared/stores/DocumentManager";
+import { ErrorDetail } from "@/shared/stores/error";
+import { useEffect, useState } from "react";
+import getSurroundingWordsByOriginId from "@/utils/getSurroundingWordsByOriginId";
 
+const documentManager = new DocumentManager();
 interface OpenListItemProps {
-  default: string;
-  refine: string;
+  errorDetail: ErrorDetail;
   description: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  error_id: string;
+  target_id: string;
 }
 
 export default function OpenListItem({
-  default: def,
-  refine,
+  errorDetail,
   description,
   onClick,
+  error_id,
+  target_id,
 }: OpenListItemProps) {
+  const [surroundingWords, setSurroundingWords] = useState({
+    after: "",
+    before: "",
+  });
+  
+  const [errorDetailAndJosa, setErrorDetailAndJosa] = useState({
+    after: errorDetail.refine_word[0],
+    before: errorDetail.origin_word,
+  });
+
+  useEffect(() => {
+    const { after, before, josaDetail } = getSurroundingWordsByOriginId(
+      target_id,
+      error_id,
+      errorDetail.refine_word[0]
+    );
+    console.log(after, before);
+    setSurroundingWords({ after: after.join(" "), before: before.join(" ") });
+    setErrorDetailAndJosa({
+      after: errorDetail.refine_word[0] + (josaDetail?.afterJosa || ""),
+      before: errorDetail.origin_word + (josaDetail?.beforeJosa || ""),
+    });
+  }, []);
+
   return (
     <>
       <OpenListItemBox onClick={onClick}>
@@ -25,24 +56,38 @@ export default function OpenListItem({
             <All.ContextBox>
               <All.Description>{description}</All.Description>
               <All.Text>
-                {def} → <RefinedText>{refine}</RefinedText>
+                {errorDetail.origin_word} →{" "}
+                <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
               </All.Text>
             </All.ContextBox>
           </All.ListContentBox>
           <RefineBox>
-            <RefineTest>나는 이 일을</RefineTest>
-            <DeleteText>{def}</DeleteText>
-            <RefinedText>
-              {refine}
-            </RefinedText>
-              <RefineTest>할 수 있어</RefineTest>
+            <RefineTest>{surroundingWords.before}</RefineTest>
+            <DeleteText>{errorDetailAndJosa.before}</DeleteText>
+            <RefinedText>{errorDetailAndJosa.after}</RefinedText>
+            <RefineTest>{surroundingWords.after}</RefineTest>
           </RefineBox>
           <Buttons>
             <RefineButton>
-              <RefineButtonText>다듬기</RefineButtonText>
+              <RefineButtonText
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("다듬기 버튼 클릭", error_id);
+                  documentManager.resolveError(errorDetail);
+                }}
+              >
+                다듬기
+              </RefineButtonText>
             </RefineButton>
             <RefusalButton>
-              <RefusalButtonText>거절하기</RefusalButtonText>
+              <RefusalButtonText
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("거절하기 버튼 클릭", error_id);
+                }}
+              >
+                거절하기
+              </RefusalButtonText>
             </RefusalButton>
           </Buttons>
         </OpenListBox>
@@ -53,7 +98,7 @@ export default function OpenListItem({
 
 const VerticalLine = styled.div`
   width: 4px;
-  background-color: #E2E2E2;
+  background-color: #e2e2e2;
   place-self: stretch;
   border-radius: 2px;
   margin: 0;
@@ -62,7 +107,7 @@ const VerticalLine = styled.div`
 const OpenListItemBox = styled.div`
   display: flex;
   width: 100%;
-  height: 100%;
+  height: fit-content;
   padding: 10px 6px 10px 10px;
   align-items: flex-start;
   gap: 10px;
@@ -83,12 +128,13 @@ const RefineBox = styled.div`
   padding: 4px 8px;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   border-radius: 4px;
   background: #f8fbfc;
 `;
 
 const RefineTest = styled.span`
+  white-space: nowrap;
   color: #2b2b2b;
   font-family: "Noto Sans KR";
   font-size: 16px;
@@ -97,11 +143,15 @@ const RefineTest = styled.span`
   line-height: normal;
 `;
 const DeleteText = styled(RefineTest)`
-  color: #afb1c3; 
+  white-space: nowrap;
+
+  color: #afb1c3;
   text-decoration: line-through;
 `;
 
 const RefinedText = styled(RefineTest)`
+  white-space: nowrap;
+
   color: #05a569;
 `;
 
