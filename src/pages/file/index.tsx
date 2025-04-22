@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import FileContainer from "@/shared/components/file/FileContainer";
-import NewFile from "@/shared/components/file/NewFile";
+import FileContainer from "@/component/file/FileContainer";
+import NewFile from "@/component/file/NewFile";
 
 export default function FilePage() {
   return (
