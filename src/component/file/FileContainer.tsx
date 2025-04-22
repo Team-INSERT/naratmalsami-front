@@ -13,17 +13,17 @@ export default function FileContainer() {
       <LatestSortBox>
         <Latest>최근</Latest>
         <ListOrIcon>
-          <ListSortImage
+          <SortImage
             src={listSortImage}
             alt="list"
             onClick={() => setIsIconSort(false)}
-            isSelected={!isIconSort}
+            className={!isIconSort ? "inactive" : ""}
           />
-          <IconSortImage
+          <SortImage
             src={iconSortImage}
             alt="icon"
             onClick={() => setIsIconSort(true)}
-            isSelected={isIconSort}
+            className={isIconSort ? "inactive" : ""}
           />
         </ListOrIcon>
       </LatestSortBox>
@@ -35,13 +35,14 @@ export default function FileContainer() {
   );
 }
 
-const IconSortImage = styled.img<{ isSelected: boolean }>`
+const SortImage = styled.img`
   user-select: none;
   cursor: pointer;
-  filter: ${(props) => (props.isSelected ? "none" : "grayscale(100%)")};
-`;
 
-const ListSortImage = styled(IconSortImage)``;
+  &.inactive {
+    filter: brightness(0.7);
+  }
+`;
 
 const LatestSortBox = styled.div`
   display: flex;
