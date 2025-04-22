@@ -1,14 +1,13 @@
-import React from "react";
-import styled from "styled-components";
-import word from "/public/images/icon/word.svg";
+import styled from 'styled-components';
+import word from '/public/images/icon/word.svg';
 
 export default function ListSort() {
   return (
     <>
       <ListSortBox>
         {Array.from({ length: 7 }).map((_, index) => (
-          <ListFile>
-            <img src={word} alt="word" width={37} height={60} />
+          <ListFile key={index}>
+            <img src={word} alt='word' width={37} height={60} />
             <FileNameDate>
               <FileName>FileNameFileName...</FileName>
               <FIleDate>2025-01-01</FIleDate>

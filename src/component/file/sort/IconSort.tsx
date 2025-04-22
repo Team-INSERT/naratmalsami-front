@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { useFileStore } from "@/shared/stores/useDocument";
 import { useNavigate } from "react-router-dom";

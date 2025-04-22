@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": " vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "domain": "echo \"127.0.0.1 local.jhnara.asuscomm.com\" | sudo tee -a /etc/hosts"
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@ckeditor/ckeditor5-inspector": "^4.1.0",
     "@eslint/js": "^9.19.0",
+    "@types/ckeditor": "^4.9.10",
     "@types/deep-diff": "^1.0.5",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",

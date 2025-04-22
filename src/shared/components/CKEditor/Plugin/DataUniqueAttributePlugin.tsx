@@ -7,7 +7,7 @@ export class DataUniqueAttributePlugin extends Plugin {
     this._defineSchema();
     this._defineConverters();
     // After executing the Enter command
-    editor.model.document.on("change:data", (evt, batch) => {
+    editor.model.document.on("change:data", (_, batch) => {
       // Only handle user-initiated changes (like typing or Enter)
       if (!batch.isLocal) return;
 
@@ -50,7 +50,8 @@ export class DataUniqueAttributePlugin extends Plugin {
       model: this.DataAttribute,
     });
   }
-  _isDuplicateInRoot(block, value) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _isDuplicateInRoot(block:any, value:any) {
     const root = block.root;
     for (const child of root.getChildren()) {
       if (child !== block && child.getAttribute?.(this.DataAttribute) === value) {

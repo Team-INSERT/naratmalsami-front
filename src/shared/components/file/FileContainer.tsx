@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import IconSortImage from "/public/images/icon/icon-sort.svg";
-import ListSortImage from "/public/images/icon/list-sort.svg";
-import IconSort from "./sort/IconSort";
-import ListSort from "./sort/ListSort";
+import { useState } from 'react';
+import styled from 'styled-components';
+import IconSortImage from '/public/images/icon/icon-sort.svg';
+import ListSortImage from '/public/images/icon/list-sort.svg';
+import IconSort from './sort/IconSort';
+import ListSort from './sort/ListSort';
 
 export default function FileContainer() {
   const [isIconSort, setIsIconSort] = useState(true);
@@ -15,15 +15,15 @@ export default function FileContainer() {
         <ListOrIcon>
           <img
             src={ListSortImage}
-            alt="list"
+            alt='list'
             onClick={() => setIsIconSort(false)}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: 'pointer' }}
           />
           <img
             src={IconSortImage}
-            alt="icon"
+            alt='icon'
             onClick={() => setIsIconSort(true)}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: 'pointer' }}
           />
         </ListOrIcon>
       </LatestSortBox>

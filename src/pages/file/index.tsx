@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import FileContainer from "@/component/file/FileContainer";
 import NewFile from "@/component/file/NewFile";

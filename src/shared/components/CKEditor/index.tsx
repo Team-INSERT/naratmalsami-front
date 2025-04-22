@@ -447,9 +447,8 @@ export default function CKEditorComponent() {
                         }}
                         editor={DecoupledEditor}
                         config={editorConfig}
-                        onChange={(event, editor) => {
+                        onChange={(_, editor) => {
                           // 타이머 재시작
-                          const data = editor.getData();
                           timerRef.current.stop();
                           timerRef.current.start(3000);
                         }}

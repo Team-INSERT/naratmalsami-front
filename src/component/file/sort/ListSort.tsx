@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import styled from "styled-components";
 import naraFile from "/public/images/icon/naraFile.svg";
 import { useFileStore } from "@/shared/stores/useDocument";
