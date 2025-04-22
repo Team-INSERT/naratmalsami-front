@@ -12,6 +12,7 @@ export default function SideBar() {
 
 	const documentManager = React.useMemo(() => new DocumentManager(), []);
 	const [selectedErrorId, setSelectedErrorId] = useState('');
+	const [flashTick, setFlashTick] = useState(0);
 	const [errorParagraphs, setErrorParagraphs] = useState(documentManager.getErrorParagraphs());
 	const [resolvedErrors, setResolvedErrors] = useState(documentManager.getResolvedErrors());
 
@@ -46,7 +47,7 @@ export default function SideBar() {
 		if (!target) return;
 
 		if (prevRef.current.timer) clearTimeout(prevRef.current.timer);
-		if (prevRef.current.el && prevRef.current.el !== target) {
+		if (prevRef.current.el) {
 			prevRef.current.el.classList.remove('flash-highlight');
 		}
 
@@ -59,7 +60,7 @@ export default function SideBar() {
 		}, HIGHLIGHT_DURATION);
 
 		prevRef.current = { el: target, timer };
-	}, [selectedErrorId]);
+	}, [selectedErrorId, flashTick]);
 
 	React.useEffect(() => {
 		return () => {
@@ -97,6 +98,7 @@ export default function SideBar() {
 										description={error_description[error.code]}
 										onClick={() => {
 											setSelectedErrorId(error.error_id);
+											setFlashTick((t) => t + 1);
 										}}
 									/>
 								)}
@@ -111,6 +113,7 @@ export default function SideBar() {
 								errorDetail={resolvedError}
 								onClick={() => {
 									setSelectedErrorId(resolvedError.error_id);
+									setFlashTick((t) => t + 1);
 								}}
 							/>
 						);
