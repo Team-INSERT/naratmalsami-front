@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export default function TabsBlock() {
+export default function TabsBlock({ count }: { count: number }) {
   return (
     <>
       <TabsBlockBox>
@@ -8,7 +8,7 @@ export default function TabsBlock() {
           <Content>
             <Text>다듬을 단어</Text>
             <Value>
-              <ValueText>14</ValueText>
+              <ValueText>{count}</ValueText>
             </Value>
           </Content>
         </BlockBox>

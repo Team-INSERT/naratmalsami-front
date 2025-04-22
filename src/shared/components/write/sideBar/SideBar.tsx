@@ -12,6 +12,11 @@ export default function SideBar() {
   const [errorParagraphs, setErrorParagraphs] = useState(
     documentManager.getErrorParagraphs()
   );
+
+  const count = errorParagraphs.reduce((acc, cur) => {
+    return acc + cur.errors.length;
+  }, 0);
+
   const [resolvedErrors, setResolvedErrors] = useState(
     documentManager.getResolvedErrors()
   );
@@ -36,7 +41,7 @@ export default function SideBar() {
   return (
     <React.Fragment>
       <SideBarBox>
-        <TabsBlock />
+        <TabsBlock count={count} />
         <SideBarMain>
           {errorParagraphs.map((errorsInParagraph) => {
             return errorsInParagraph.errors.map((error) => (
