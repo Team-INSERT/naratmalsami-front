@@ -16,7 +16,15 @@ export class DataUniqueAttributePlugin extends Plugin {
 
       // Iterate over all insertions in the differ
       changes.forEach((change) => {
-        if (change.type === 'insert') {
+        if (
+          change.type === 'insert' &&
+          (change.name === 'paragraph' ||
+            change.name === 'heading1' ||
+            change.name === 'heading2' ||
+            change.name === 'heading3' ||
+            change.name === 'blockQuote' ||
+            change.name === 'listItem')
+        ) {
           const block = change.position.nodeAfter;
           if (block && !handledBlocks.has(block)) {
             const currentValue = block.getAttribute(this.DataAttribute);
