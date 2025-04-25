@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import Sidebar from "@/shared/components/write/sideBar/SideBar";
-import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
-import translations from "../../../../node_modules/ckeditor5/dist/translations/ko";
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import Sidebar from '@/shared/components/write/sideBar/SideBar';
+import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
+import translations from '../../../../node_modules/ckeditor5/dist/translations/ko';
 import {
   DecoupledEditor,
   Alignment,
@@ -79,21 +79,24 @@ import {
   TodoList,
   Underline,
   WordCount,
-} from "ckeditor5";
-import HoverTracker from "@/shared/components/overlay/HoverTracker";
+} from 'ckeditor5';
+import HoverTracker from '@/shared/components/overlay/HoverTracker';
 
-import "ckeditor5/ckeditor5.css";
+import 'ckeditor5/ckeditor5.css';
 
-import "./style.css";
+import './style.css';
 // import { useDocument } from "@/shared/stores/useDocument";
-import { DocumentManager } from "@/shared/stores/DocumentManager";
-import * as S from "./WriteHeader/style";
-import Timer from "tiny-timer";
-import { ForeignWordPlugin, RefinedWordPlugin } from "./Plugin/ForeignAndRefineWordPlugin";
-import { DataUniqueAttributePlugin } from "./Plugin/DataUniqueAttributePlugin";
+import { DocumentManager } from '@/shared/stores/DocumentManager';
+import * as S from './WriteHeader/style';
+import Timer from 'tiny-timer';
+import {
+  ForeignWordPlugin,
+  RefinedWordPlugin,
+} from './Plugin/ForeignAndRefineWordPlugin';
+import { DataUniqueAttributePlugin } from './Plugin/DataUniqueAttributePlugin';
 
 // const LICENSE_KEY = import.meta.env.VITE_CKEDITOR_LICENSE_KEY;
-const LICENSE_KEY = "GPL";
+const LICENSE_KEY = 'GPL';
 
 const documentManager = new DocumentManager();
 export default function CKEditorComponent() {
@@ -116,14 +119,14 @@ export default function CKEditorComponent() {
 
   // 파일 데이터 상태
   const [fileData, setFileData] = useState<fileDataType>({
-    title: "",
-    content: "",
-    hashed_id: "",
-    updated_at: "",
+    title: '',
+    content: '',
+    hashed_id: '',
+    updated_at: '',
   });
 
   function getParent() {
-    const parentDiv = document.querySelector(".ck-editor__editable");
+    const parentDiv = document.querySelector('.ck-editor__editable');
     if (parentDiv) {
       return parentDiv.innerHTML;
     }
@@ -134,8 +137,8 @@ export default function CKEditorComponent() {
     const timer = timerRef.current;
 
     // 에디터 미사용 액션
-    timer.on("done", () => {
-      const currentVirtualData = getParent() || "";
+    timer.on('done', () => {
+      const currentVirtualData = getParent() || '';
       documentManager.handleDocumentModifications(currentVirtualData);
     });
 
@@ -150,22 +153,25 @@ export default function CKEditorComponent() {
     (async () => {
       if (import.meta.env.VITE_MOCK_DATA) {
         setFileData({
-          title: "Sample Title",
-          content: "Sample Content",
-          hashed_id: "sample-hashed-id",
+          title: 'Sample Title',
+          content: 'Sample Content',
+          hashed_id: 'sample-hashed-id',
           updated_at: new Date().toISOString(),
         });
         setIsLayoutReady(true);
       } else {
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/files/${hashed_id}`, {
-            method: "GET",
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/files/${hashed_id}`,
+            {
+              method: 'GET',
 
-            headers: {
-              "Content-Type": "application/json",
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
             },
-            credentials: "include",
-          });
+          );
           const data = await response.json();
           // 파일 데이터 설정
           setFileData(data);
@@ -175,7 +181,7 @@ export default function CKEditorComponent() {
           setIsLayoutReady(true);
           return () => setIsLayoutReady(false);
         } catch (error) {
-          console.error("Error:", error);
+          console.error('Error:', error);
         }
       }
     })();
@@ -190,24 +196,24 @@ export default function CKEditorComponent() {
       editorConfig: {
         toolbar: {
           items: [
-            "heading",
-            "|",
-            "fontSize",
-            "fontFamily",
-            "fontColor",
-            "fontBackgroundColor",
-            "|",
-            "bold",
-            "italic",
-            "underline",
-            "|",
-            "link",
-            "insertTable",
-            "|",
-            "alignment",
-            "|",
-            "outdent",
-            "indent",
+            'heading',
+            '|',
+            'fontSize',
+            'fontFamily',
+            'fontColor',
+            'fontBackgroundColor',
+            '|',
+            'bold',
+            'italic',
+            'underline',
+            '|',
+            'link',
+            'insertTable',
+            '|',
+            'alignment',
+            '|',
+            'outdent',
+            'indent',
           ],
           shouldNotGroupWhenFull: false,
         },
@@ -290,56 +296,56 @@ export default function CKEditorComponent() {
           ForeignWordPlugin,
           RefinedWordPlugin,
         ],
-        balloonToolbar: ["bold", "italic", "|", "link"],
+        balloonToolbar: ['bold', 'italic', '|', 'link'],
         fontFamily: {
           supportAllValues: true,
         },
         fontSize: {
-          options: [10, 12, 14, "default", 18, 20, 22],
+          options: [10, 12, 14, 'default', 18, 20, 22],
           supportAllValues: true,
         },
         heading: {
           options: [
             {
-              model: "paragraph",
-              title: "Paragraph",
-              class: "ck-heading_paragraph",
+              model: 'paragraph',
+              title: 'Paragraph',
+              class: 'ck-heading_paragraph',
             },
             {
-              model: "heading1",
-              view: "h1",
-              title: "Heading 1",
-              class: "ck-heading_heading1",
+              model: 'heading1',
+              view: 'h1',
+              title: 'Heading 1',
+              class: 'ck-heading_heading1',
             },
             {
-              model: "heading2",
-              view: "h2",
-              title: "Heading 2",
-              class: "ck-heading_heading2",
+              model: 'heading2',
+              view: 'h2',
+              title: 'Heading 2',
+              class: 'ck-heading_heading2',
             },
             {
-              model: "heading3",
-              view: "h3",
-              title: "Heading 3",
-              class: "ck-heading_heading3",
+              model: 'heading3',
+              view: 'h3',
+              title: 'Heading 3',
+              class: 'ck-heading_heading3',
             },
             {
-              model: "heading4",
-              view: "h4",
-              title: "Heading 4",
-              class: "ck-heading_heading4",
+              model: 'heading4',
+              view: 'h4',
+              title: 'Heading 4',
+              class: 'ck-heading_heading4',
             },
             {
-              model: "heading5",
-              view: "h5",
-              title: "Heading 5",
-              class: "ck-heading_heading5",
+              model: 'heading5',
+              view: 'h5',
+              title: 'Heading 5',
+              class: 'ck-heading_heading5',
             },
             {
-              model: "heading6",
-              view: "h6",
-              title: "Heading 6",
-              class: "ck-heading_heading6",
+              model: 'heading6',
+              view: 'h6',
+              title: 'Heading 6',
+              class: 'ck-heading_heading6',
             },
           ],
         },
@@ -350,8 +356,8 @@ export default function CKEditorComponent() {
               classes: true,
               styles: true,
               attributes: {
-                id: true,
-                "data-unique": true,
+                'id': true,
+                'data-unique': true,
               },
             },
             // {
@@ -374,13 +380,13 @@ export default function CKEditorComponent() {
         licenseKey: LICENSE_KEY,
         link: {
           addTargetToExternalLinks: true,
-          defaultProtocol: "https://",
+          defaultProtocol: 'https://',
           decorators: {
             toggleDownloadable: {
-              mode: "manual",
-              label: "Downloadable",
+              mode: 'manual',
+              label: 'Downloadable',
               attributes: {
-                download: "file",
+                download: 'file',
               },
             },
           },
@@ -388,14 +394,14 @@ export default function CKEditorComponent() {
         menuBar: {
           isVisible: true,
         },
-        placeholder: "Type or paste your content here!",
+        placeholder: 'Type or paste your content here!',
         table: {
           contentToolbar: [
-            "tableColumn",
-            "tableRow",
-            "mergeTableCells",
-            "tableProperties",
-            "tableCellProperties",
+            'tableColumn',
+            'tableRow',
+            'mergeTableCells',
+            'tableProperties',
+            'tableCellProperties',
           ],
         },
         translations: translations,
@@ -404,45 +410,57 @@ export default function CKEditorComponent() {
   }, [isLayoutReady]);
 
   return (
-    <div className="main-container">
+    <div className='main-container'>
       <div
-        className="editor-container editor-container_document-editor editor-container_include-word-count"
+        className='editor-container editor-container_document-editor editor-container_include-word-count'
         ref={editorContainerRef}
       >
         <S.WriteHeader>
-          <p className="title">{fileData.title}</p>
-          <div className="editor-container__menu-bar" ref={editorMenuBarRef}></div>
+          <p className='title'>{fileData.title}</p>
+          <div
+            className='editor-container__menu-bar'
+            ref={editorMenuBarRef}
+          ></div>
         </S.WriteHeader>
         <S.WriteSection>
-          <div className="editor-container-section">
-            <div className="editor-container__toolbar" ref={editorToolbarRef}></div>
-            <div className="editor-container__editor-wrapper">
-              <div className="editor-container__editor">
+          <div className='editor-container-section'>
+            <div
+              className='editor-container__toolbar'
+              ref={editorToolbarRef}
+            ></div>
+            <div className='editor-container__editor-wrapper'>
+              <div className='editor-container__editor'>
                 <div>
                   {isLayoutReady && editorConfig && (
                     <HoverTracker>
                       <CKEditor
                         onReady={(editor) => {
-                          console.log("Editor is ready to use!", editor);
+                          console.log('Editor is ready to use!', editor);
                           // 에디터 인스턴스 저장
                           editorRef.current = editor;
                           documentManager.initDocument(editorRef);
-                          const wordCount = editor.plugins.get("WordCount");
-                          editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
-                          editorToolbarRef.current.appendChild(editor.ui.view.toolbar.element);
-                          editorMenuBarRef.current.appendChild(editor.ui.view.menuBarView.element);
+                          const wordCount = editor.plugins.get('WordCount');
+                          editorWordCountRef.current.appendChild(
+                            wordCount.wordCountContainer,
+                          );
+                          editorToolbarRef.current.appendChild(
+                            editor.ui.view.toolbar.element,
+                          );
+                          editorMenuBarRef.current.appendChild(
+                            editor.ui.view.menuBarView.element,
+                          );
 
                           CKEditorInspector.attach(editor);
                         }}
                         onAfterDestroy={() => {
-                          Array.from(editorWordCountRef.current.children).forEach((child) =>
-                            child.remove()
+                          Array.from(
+                            editorWordCountRef.current.children,
+                          ).forEach((child) => child.remove());
+                          Array.from(editorToolbarRef.current.children).forEach(
+                            (child) => child.remove(),
                           );
-                          Array.from(editorToolbarRef.current.children).forEach((child) =>
-                            child.remove()
-                          );
-                          Array.from(editorMenuBarRef.current.children).forEach((child) =>
-                            child.remove()
+                          Array.from(editorMenuBarRef.current.children).forEach(
+                            (child) => child.remove(),
                           );
                         }}
                         editor={DecoupledEditor}
@@ -450,19 +468,24 @@ export default function CKEditorComponent() {
                         onChange={(_, editor) => {
                           // 타이머 재시작
                           timerRef.current.stop();
-                          timerRef.current.start(3000);
+                          timerRef.current.start(2000);
                         }}
                       />
                     </HoverTracker>
                   )}
-                  {!isLayoutReady && <div className="editor-loading">Loading editor...</div>}
+                  {!isLayoutReady && (
+                    <div className='editor-loading'>Loading editor...</div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
           <Sidebar />
         </S.WriteSection>
-        <div className="editor_container__word-count" ref={editorWordCountRef}></div>
+        <div
+          className='editor_container__word-count'
+          ref={editorWordCountRef}
+        ></div>
       </div>
     </div>
   );

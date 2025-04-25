@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 interface morpDataType {
   id: number;
@@ -25,7 +25,7 @@ interface responseType {
 }
 
 export const analyzeMorpheme = async (
-  parsedText: string
+  parsedText: string,
 ): Promise<responseType> => {
   const URL = import.meta.env.VITE_ETRI_ADDRESS;
   const API_KEY = import.meta.env.VITE_ETRI_KEY;
@@ -38,16 +38,16 @@ export const analyzeMorpheme = async (
       URL,
       {
         argument: {
-          analysis_code: "morp",
+          analysis_code: 'morp',
           text: parsedText,
         },
       },
       {
         headers: {
-          Authorization: API_KEY,
-          "Content-Type": "application/json",
+          // Authorization: API_KEY,
+          'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     response.data.return_object.sentence.forEach(
@@ -56,9 +56,9 @@ export const analyzeMorpheme = async (
 
         sentence.morp.forEach((morp: morpDataType) => {
           if (
-            morp.type === "NNG" ||
-            morp.type === "SL" ||
-            morp.type === "NNP"
+            morp.type === 'NNG' ||
+            morp.type === 'SL' ||
+            morp.type === 'NNP'
           ) {
             morphemeList.push({
               lemma: morp.lemma,
@@ -66,10 +66,10 @@ export const analyzeMorpheme = async (
             });
           }
         });
-      }
+      },
     );
   } catch (error) {
-    console.error("API 호출 중 에러 발생", error);
+    console.error('API 호출 중 에러 발생', error);
   }
 
   return { morphemeList, sentenceList };
