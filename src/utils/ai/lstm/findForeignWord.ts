@@ -1,8 +1,6 @@
-import { analyzeMorpheme } from './analyzeMorpheme';
+import { analyzeMorpheme, morphemeListType } from './analyzeMorpheme';
 import * as Hangul from 'hangul-js';
 import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-wasm';
-import { morphemeListType } from './analyzeMorpheme';
 
 interface responseType {
   foreignWords: string[],
