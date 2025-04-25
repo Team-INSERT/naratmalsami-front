@@ -18,6 +18,14 @@ function padSequences(tensor: tf.Tensor) {
   return tensor.slice([0], [25]);
 }
 
+let model: tf.LayersModel;
+
+const loadModelOnce = async () => {
+  if (!model) model = await tf.loadLayersModel('/tsfj/model.json');
+}
+
+loadModelOnce();
+
 const tokenDict: Record<string, number> = {
   'ㄱ': 1, 'ㄲ': 2, 'ㄳ': 3, 'ㄴ': 4, 'ㄵ': 5, 'ㄶ': 6, 'ㄷ': 7, 'ㄸ': 8, 'ㄹ': 9, 'ㄺ': 10, 
   'ㄻ': 11, 'ㄼ': 12, 'ㄽ': 13, 'ㄾ': 14, 'ㄿ': 15, 'ㅀ': 16, 'ㅁ': 17, 'ㅂ': 18, 'ㅃ': 19, 'ㅄ': 20, 
@@ -30,8 +38,6 @@ const tokenDict: Record<string, number> = {
 }
 
 export const findForeignWord = async (parsedText: string): Promise<responseType> => {
-  const model = await tf.loadLayersModel('/tsfj/model.json');
-  
   const { morphemeList, sentenceList } = await analyzeMorpheme(parsedText);
   const foreignWords = new Set<string>();
 
