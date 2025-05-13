@@ -1,6 +1,6 @@
-import OverlayRecommendedBox from "../Box";
-import * as S from "./style";
-import React, { useCallback, useRef, useState } from "react";
+import OverlayRecommendedBox from '../Box';
+import * as S from './style';
+import React, { useCallback, useRef, useState } from 'react';
 
 export default function HoverTracker({
   children,
@@ -16,10 +16,9 @@ export default function HoverTracker({
 
   const handleMouseOver = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
-    const originId = target.attributes.getNamedItem("originid")?.value;
+    const originId = target.attributes.getNamedItem('originid')?.value;
 
     if (originId && containerRef.current) {
-      console.log("Hovered element originId:", originId);
       const containerRect = containerRef.current.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
       const scrollTop = containerRef.current.scrollTop; // Get container scroll position
@@ -39,11 +38,17 @@ export default function HoverTracker({
     }
 
     setOriginId(originId);
-
   }, []);
 
   return (
-    <div ref={containerRef} onMouseOver={handleMouseOver} style={{ position: 'relative', overflow: 'auto' /* Ensure container is scrollable if needed */ }}>
+    <div
+      ref={containerRef}
+      onMouseOver={handleMouseOver}
+      style={{
+        position: 'relative',
+        overflow: 'auto' /* Ensure container is scrollable if needed */,
+      }}
+    >
       <S.Overlay>
         <OverlayRecommendedBox
           left={targetPosition.left}

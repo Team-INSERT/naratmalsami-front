@@ -44,7 +44,7 @@ export const analyzeMorpheme = async (
       },
       {
         headers: {
-          // Authorization: API_KEY,
+          'Authorization': API_KEY,
           'Content-Type': 'application/json',
         },
       },

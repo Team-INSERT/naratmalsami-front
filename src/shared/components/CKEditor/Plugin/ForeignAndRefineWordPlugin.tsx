@@ -139,10 +139,11 @@ export class RefinedWordPlugin extends ForeignWordPlugin {
   }
   protected _deleteWordById(error_id: string) {
     // this.documentManager.deleteRefinedWordById(error_id);
-    console.log(`Deleted refined word with ID: ${error_id}`);
+    // console.log(`Deleted refined word with ID: ${error_id}`);
+    return error_id;
   }
   protected _observeMutations(editable: HTMLElement) {
-    console.log(editable);
-    return;
+    // console.log(editable);
+    return editable;
   }
 }

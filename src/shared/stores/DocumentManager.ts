@@ -1,9 +1,9 @@
-import deepDiff from "deep-diff";
-import { ErrorDetail, ErrorsInParagraph } from "./error";
-import { HtmlProcessor } from "@/utils/HtmlProcessor";
-import { AiService } from "@/utils/AiService";
-import { DocumentService } from "@/shared/services/DocumentService";
-import { EditorRef } from "@/shared/services/DocumentService";
+import deepDiff from 'deep-diff';
+import { ErrorDetail, ErrorsInParagraph } from './error';
+import { HtmlProcessor } from '@/utils/HtmlProcessor';
+import { AiService } from '@/utils/AiService';
+import { DocumentService } from '@/shared/services/DocumentService';
+import { EditorRef } from '@/shared/services/DocumentService';
 /**
  * 문서 관리를 위한 DocumentManager 클래스입니다.
  * 외래어 순화, 문서 수정 처리, 구독 등 다양한 기능을 제공합니다.
@@ -35,12 +35,14 @@ export class DocumentManager {
    * @param error 외래어 상세 정보 객체
    */
   public resolveError(error: ErrorDetail): void {
-    const resolvedDocument = DocumentManager.documentService.resolveError(error);
+    const resolvedDocument =
+      DocumentManager.documentService.resolveError(error);
 
     DocumentManager.documentService.setPreviousDocuments(
       this.documentProcessor.processHtmlDocument(
-        resolvedDocument.querySelector(".ck-editor__editable")?.innerHTML as string
-      )
+        resolvedDocument.querySelector('.ck-editor__editable')
+          ?.innerHTML as string,
+      ),
     );
   }
   private static modificationQueue: Promise<void> = Promise.resolve();
@@ -52,8 +54,8 @@ export class DocumentManager {
    */
   public handleDocumentModifications(documentContext: string): Promise<void> {
     // Add the modification to the queue
-    DocumentManager.modificationQueue = DocumentManager.modificationQueue.then(() =>
-      this._processDocumentModification(documentContext)
+    DocumentManager.modificationQueue = DocumentManager.modificationQueue.then(
+      () => this._processDocumentModification(documentContext),
     );
     return DocumentManager.modificationQueue;
   }
@@ -63,13 +65,17 @@ export class DocumentManager {
    * @param documentContext 수정된 문서의 HTML 문자열
    * @returns Promise<void> 수정 작업이 완료되면 resolve되는 promise
    */
-  private async _processDocumentModification(documentContext: string): Promise<void> {
-    const editedDocument = this.documentProcessor.processHtmlDocument(documentContext);
-    const previousDocument = DocumentManager.documentService.getPreviousDocuments();
+  private async _processDocumentModification(
+    documentContext: string,
+  ): Promise<void> {
+    const editedDocument =
+      this.documentProcessor.processHtmlDocument(documentContext);
+    const previousDocument =
+      DocumentManager.documentService.getPreviousDocuments();
 
     const differences = deepDiff.diff(
       HtmlProcessor.prepareDiff(previousDocument),
-      HtmlProcessor.prepareDiff(editedDocument)
+      HtmlProcessor.prepareDiff(editedDocument),
     );
 
     if (!differences || differences.length === 0) {
@@ -78,7 +84,7 @@ export class DocumentManager {
 
     const modifiedElements = this.documentProcessor.extractModifiedElements(
       differences,
-      editedDocument
+      editedDocument,
     );
 
     if (modifiedElements[0] == undefined) {
@@ -86,14 +92,11 @@ export class DocumentManager {
       return;
     }
 
-    console.debug("Modified Elements:", modifiedElements);
-    console.debug("CurrentDocument:", documentContext);
-    console.debug("PreviousDocument:", previousDocument);
-    console.debug("editedDocument:", editedDocument);
+    console.debug('수정된 객체들:', modifiedElements);
 
     DocumentManager.documentService.setPreviousDocuments(editedDocument);
     await DocumentManager.documentService.handleAiRefinement(
-      AiService.fetchAiRefinementsLocal(modifiedElements)
+      AiService.fetchAiRefinementsLocal(modifiedElements),
     );
   }
 

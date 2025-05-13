@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import loanword from "/public/images/icon/loanword.svg";
-import * as All from "./ErrorListItem";
-import { DocumentManager } from "@/shared/stores/DocumentManager";
-import { ErrorDetail } from "@/shared/stores/error";
-import { useEffect, useState } from "react";
-import getSurroundingWordsByOriginId from "@/utils/getSurroundingWordsByOriginId";
+import styled from 'styled-components';
+import loanword from '/public/images/icon/loanword.svg';
+import * as All from './ErrorListItem';
+import { DocumentManager } from '@/shared/stores/DocumentManager';
+import { ErrorDetail } from '@/shared/stores/error';
+import { useEffect, useState } from 'react';
+import getSurroundingWordsByOriginId from '@/utils/getSurroundingWordsByOriginId';
 
 const documentManager = new DocumentManager();
 interface OpenListItemProps {
@@ -23,10 +23,10 @@ export default function OpenListItem({
   target_id,
 }: OpenListItemProps) {
   const [surroundingWords, setSurroundingWords] = useState({
-    after: "",
-    before: "",
+    after: '',
+    before: '',
   });
-  
+
   const [errorDetailAndJosa, setErrorDetailAndJosa] = useState({
     after: errorDetail.refine_word[0],
     before: errorDetail.origin_word,
@@ -36,13 +36,12 @@ export default function OpenListItem({
     const { after, before, josaDetail } = getSurroundingWordsByOriginId(
       target_id,
       error_id,
-      errorDetail.refine_word[0]
+      errorDetail.refine_word[0],
     );
-    console.log(after, before);
-    setSurroundingWords({ after: after.join(" "), before: before.join(" ") });
+    setSurroundingWords({ after: after.join(' '), before: before.join(' ') });
     setErrorDetailAndJosa({
-      after: errorDetail.refine_word[0] + (josaDetail?.afterJosa || ""),
-      before: errorDetail.origin_word + (josaDetail?.beforeJosa || ""),
+      after: errorDetail.refine_word[0] + (josaDetail?.afterJosa || ''),
+      before: errorDetail.origin_word + (josaDetail?.beforeJosa || ''),
     });
   }, []);
 
@@ -52,11 +51,11 @@ export default function OpenListItem({
         <VerticalLine />
         <OpenListBox>
           <All.ListContentBox>
-            <All.Loanword src={loanword} alt="loanword" />
+            <All.Loanword src={loanword} alt='loanword' />
             <All.ContextBox>
               <All.Description>{description}</All.Description>
               <All.Text>
-                {errorDetail.origin_word} →{" "}
+                {errorDetail.origin_word} →{' '}
                 <RefinedText>{errorDetail.refine_word[0]}</RefinedText>
               </All.Text>
             </All.ContextBox>
@@ -72,7 +71,7 @@ export default function OpenListItem({
               <RefineButtonText
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log("다듬기 버튼 클릭", error_id);
+                  console.log('다듬기 버튼 클릭', error_id);
                   documentManager.resolveError(errorDetail);
                 }}
               >
@@ -83,7 +82,7 @@ export default function OpenListItem({
               <RefusalButtonText
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log("거절하기 버튼 클릭", error_id);
+                  console.log('거절하기 버튼 클릭', error_id);
                 }}
               >
                 거절하기
@@ -136,7 +135,7 @@ const RefineBox = styled.div`
 const RefineTest = styled.span`
   white-space: nowrap;
   color: #2b2b2b;
-  font-family: "Noto Sans KR";
+  font-family: 'Noto Sans KR';
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -176,7 +175,7 @@ const RefineButton = styled.button`
 
 const RefineButtonText = styled.span`
   color: #fff;
-  font-family: "Noto Sans KR";
+  font-family: 'Noto Sans KR';
   font-size: 12px;
   font-style: normal;
   font-weight: 700;

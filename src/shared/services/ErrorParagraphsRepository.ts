@@ -1,4 +1,4 @@
-import { ErrorDetail, ErrorsInParagraph } from "../stores/error";
+import { ErrorDetail, ErrorsInParagraph } from '../stores/error';
 
 /**
  * 외래어가 포함된 문단과 그 문단에 포함된 외래어 정보를 관리하는 클래스입니다.
@@ -17,12 +17,16 @@ export class ErrorParagraphsRepository {
    * 외래어 단락을 추가합니다.
    * @param errorParagraphs 외래어 단락 정보
    */
-  public addErrorParagraphs(errorParagraphs: ReadonlyArray<ErrorsInParagraph>): void {
+  public addErrorParagraphs(
+    errorParagraphs: ReadonlyArray<ErrorsInParagraph>,
+  ): void {
     for (const errorParagraph of errorParagraphs) {
-      const existingErrorParagraph = this.errorParagraphsMap.get(errorParagraph.target_id);
+      const existingErrorParagraph = this.errorParagraphsMap.get(
+        errorParagraph.target_id,
+      );
       if (existingErrorParagraph) {
         console.warn(
-          `Error paragraph with target_id ${errorParagraph.target_id} already exists.\nwill be replaced.`
+          `Error paragraph with target_id ${errorParagraph.target_id} already exists.\nwill be replaced.`,
         );
       }
       this.errorParagraphsMap.set(errorParagraph.target_id, errorParagraph);
@@ -42,7 +46,7 @@ export class ErrorParagraphsRepository {
    * @param targetId 외래어 단락 ID
    */
   public deleteErrorParagraph(entry: ErrorsInParagraph): void {
-    if (!entry) throw new Error("entry is undefined");
+    if (!entry) throw new Error('entry is undefined');
     this.errorParagraphsMap.delete(entry.target_id);
     this._notify();
   }
@@ -51,8 +55,9 @@ export class ErrorParagraphsRepository {
    * @param targetId 외래어 단락의 타겟 ID
    */
   public removeErrorByTargetId(targetId: string): void {
-    if (!targetId) throw new Error("targetId is undefined");
-    if (!this.errorParagraphsMap.get(targetId)) throw new Error(`targetId ${targetId} not found`);
+    if (!targetId) throw new Error('targetId is undefined');
+    if (!this.errorParagraphsMap.get(targetId))
+      throw new Error(`targetId ${targetId} not found`);
     this.errorParagraphsMap.delete(targetId);
     this._notify();
   }
@@ -61,7 +66,7 @@ export class ErrorParagraphsRepository {
    * @param error_id 외래어 ID
    */
   public deleteOriginWordById(error_id: string) {
-    if (!error_id) throw new Error("error_id is undefined");
+    if (!error_id) throw new Error('error_id is undefined');
     for (const entry of this.errorParagraphsMap.values()) {
       const idx = entry.errors.findIndex((e) => e.error_id === error_id);
       if (idx !== -1) {
@@ -77,7 +82,7 @@ export class ErrorParagraphsRepository {
    * @param refine_id 순화어 ID
    */
   public deleteRefinedWordById(refine_id: string) {
-    if (!refine_id) throw new Error("error_id is undefined");
+    if (!refine_id) throw new Error('error_id is undefined');
     for (const entry of this.resolvedErrorsMap.values()) {
       if (entry.error_id === refine_id) {
         this.resolvedErrorsMap.delete(entry.error_id);
@@ -89,11 +94,14 @@ export class ErrorParagraphsRepository {
   }
 
   public resolveErrorById(error_id: string) {
-    const entry = Array.from(this.errorParagraphsMap.values()).find((errorParagraph) =>
-      errorParagraph.errors.some((e) => e.error_id === error_id)
+    const entry = Array.from(this.errorParagraphsMap.values()).find(
+      (errorParagraph) =>
+        errorParagraph.errors.some((e) => e.error_id === error_id),
     );
     if (!entry) throw new Error(`Error with id ${error_id} not found`);
-    this._addResolvedErrors([entry.errors.find((e) => e.error_id === error_id) as ErrorDetail]);
+    this._addResolvedErrors([
+      entry.errors.find((e) => e.error_id === error_id) as ErrorDetail,
+    ]);
     this.deleteOriginWordById(error_id);
   }
 
@@ -127,9 +135,11 @@ export class ErrorParagraphsRepository {
    * @returns 외래어 단락 정보 (없으면 undefined)
    */
 
-  public getErrorParagraphById(errorParagraphId: string): ErrorsInParagraph | undefined {
+  public getErrorParagraphById(
+    errorParagraphId: string,
+  ): ErrorsInParagraph | undefined {
     return Array.from(this.errorParagraphsMap.values()).find(
-      (errorParagraph) => errorParagraph.errorParagraph_id === errorParagraphId
+      (errorParagraph) => errorParagraph.errorParagraph_id === errorParagraphId,
     );
   }
 
@@ -178,7 +188,7 @@ export class ErrorParagraphsRepository {
    * @private
    */
   private _notify(): void {
-    console.log("notify");
+    console.log('외래어 목록이 변화 이벤트 발신.');
     this.eventListeners.forEach((listener) => listener());
   }
 }
