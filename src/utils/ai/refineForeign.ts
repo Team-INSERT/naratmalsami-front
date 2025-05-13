@@ -1,5 +1,4 @@
 import { findForeignWord } from "./lstm/findForeignWord";
-import { dify } from "./dify/dify";
 
 interface refineResponseType {
   target_id: string;
@@ -14,7 +13,7 @@ interface refineResponseType {
 export interface foreignSentenceType {
   target_id: string;
   sentence: string;
-  foreignWord: string[];
+  foreignWords: string[];
   fullsentence: string;
 }
 
@@ -36,7 +35,7 @@ export async function* refineForeign(inputData: string[]) {
         foreignSentenceList.push({
           target_id,
           sentence,
-          foreignWord: foreignInSentence,
+          foreignWords: foreignInSentence,
           fullsentence: content,
         });
       }
@@ -46,26 +45,31 @@ export async function* refineForeign(inputData: string[]) {
   const pending = new Set<Promise<{ response: refineResponseType }>>();
 
   foreignSentenceList.forEach((foreignSentence) => {
-    const p = dify(foreignSentence).then((difyResponse) => ({
-      response: {
-        target_id: difyResponse.target_id,
-        errors: Object.entries(difyResponse.refineWord)
-          .map(([origin_word, refine_word]) => {
-            const index = foreignSentence.fullsentence.indexOf(origin_word);
-            if (index === -1) {
-              return;
-            }
-            return {
-              code: 1,
-              origin_word,
-              refine_word,
-              index,
-            };
-          })
-          .filter((error) => error !== undefined),
-      },
-    }));
-    pending.add(p);
+    foreignSentence.foreignWords.forEach((foreignWord) => {
+      const p = fetch('https://naratmalsami.kwon5700.kr/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          target_id: foreignSentence.target_id,
+          sentence: foreignSentence.sentence,
+          foreign_word: foreignWord,
+          fullsentence: foreignSentence.fullsentence
+        }),
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        return {
+          response: {
+            target_id: data.target_id,
+            errors: data.errors
+          }
+        }
+      })
+  
+      pending.add(p);
+    })
   });
 
   while (pending.size > 0) {
@@ -79,6 +83,7 @@ export async function* refineForeign(inputData: string[]) {
       });
     }
 
+    console.log(finished.response)
     yield finished.response;
   }
 }
