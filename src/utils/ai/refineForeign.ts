@@ -28,7 +28,7 @@ export async function* refineForeign(inputData: string[]) {
     const content = doc.body.textContent || "";
     let target_id = doc.querySelector("[data-unique]")?.getAttribute("data-unique") as string;
     if (!target_id) {
-      target_id = generateUniqueId(Prefix.PARAGRAPH);
+      target_id = generateUniqueId(Prefix.UNIQUE);
     }
 
     const { foreignWords, sentenceList } = await findForeignWord(content);

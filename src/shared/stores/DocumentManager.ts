@@ -72,7 +72,7 @@ export class DocumentManager {
     Array.from(body.children).forEach((child) => {
       if (["P", "H1", "H2", "H3", "H4", "H5", "H6", "LI"].includes(child.tagName)) {
         if (!child.hasAttribute("data-unique")) {
-          const newId = generateUniqueId(Prefix.PARAGRAPH);
+          const newId = generateUniqueId(Prefix.UNIQUE);
           child.setAttribute("data-unique", newId);
           wasModified = true;
         }
