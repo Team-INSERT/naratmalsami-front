@@ -122,8 +122,10 @@ export class HtmlProcessor {
       })
       .filter((index): index is number => index !== undefined);
 
-    // 중복된 인덱스를 제거
-    const uniqueIndices = [...new Set(modifiedOrAddedIndices)];
+    // 중복된 인덱스를 제거하고 오름차순으로 정렬
+    const uniqueIndices = [...new Set(modifiedOrAddedIndices)].sort(
+      (a, b) => a - b
+    );
 
     // 변경된 요소를 추출
     return uniqueIndices.map((index) => newDocument[index]);
