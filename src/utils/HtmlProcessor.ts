@@ -99,6 +99,23 @@ export class HtmlProcessor {
     return newDocument;
   }
 
+  public static createParagraphMap(elements: string[]): Map<string, string> {
+    const map = new Map<string, string>();
+    const parser = new DOMParser();
+
+    for (const element of elements) {
+      const doc = parser.parseFromString(element, "text/html");
+      const el = doc.body.firstChild as HTMLElement;
+      if (el && el.getAttribute) {
+        const id = el.getAttribute("data-unique");
+        if (id) {
+          map.set(id, el.textContent || "");
+        }
+      }
+    }
+    return map;
+  }
+
   public extractModifiedElements(
     differences: deepDiff.Diff<string[]>[],
     newDocument: string[]
