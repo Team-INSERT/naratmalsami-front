@@ -1,5 +1,6 @@
 import { findForeignWord } from "./lstm/findForeignWord";
 import { dify } from "./dify/dify";
+import generateUniqueId, { Prefix } from "../generateUniqueId";
 
 interface refineResponseType {
   target_id: string;
@@ -25,7 +26,10 @@ export async function* refineForeign(inputData: string[]) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const content = doc.body.textContent || "";
-    const target_id = doc.querySelector("[data-unique]")?.getAttribute("data-unique") as string;
+    let target_id = doc.querySelector("[data-unique]")?.getAttribute("data-unique") as string;
+    if (!target_id) {
+      target_id = generateUniqueId(Prefix.PARAGRAPH);
+    }
 
     const { foreignWords, sentenceList } = await findForeignWord(content);
 

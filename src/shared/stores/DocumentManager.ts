@@ -1,9 +1,9 @@
-import deepDiff from "deep-diff";
 import { ErrorDetail, ErrorsInParagraph } from "./error";
 import { HtmlProcessor } from "@/utils/HtmlProcessor";
 import { AiService } from "@/utils/AiService";
 import { DocumentService } from "@/shared/services/DocumentService";
 import { EditorRef } from "@/shared/services/DocumentService";
+import generateUniqueId, { Prefix } from "@/utils/generateUniqueId";
 /**
  * 문서 관리를 위한 DocumentManager 클래스입니다.
  * 외래어 순화, 문서 수정 처리, 구독 등 다양한 기능을 제공합니다.
@@ -63,35 +63,69 @@ export class DocumentManager {
    * @param documentContext 수정된 문서의 HTML 문자열
    * @returns Promise<void> 수정 작업이 완료되면 resolve되는 promise
    */
+  private _ensureElementsHaveIds(html: string): { htmlWithIds: string; wasModified: boolean } {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const body = doc.body;
+    let wasModified = false;
+
+    Array.from(body.children).forEach((child) => {
+      if (["P", "H1", "H2", "H3", "H4", "H5", "H6", "LI"].includes(child.tagName)) {
+        if (!child.hasAttribute("data-unique")) {
+          const newId = generateUniqueId(Prefix.PARAGRAPH);
+          child.setAttribute("data-unique", newId);
+          wasModified = true;
+        }
+      }
+    });
+
+    return { htmlWithIds: body.innerHTML, wasModified };
+  }
+
   private async _processDocumentModification(documentContext: string): Promise<void> {
-    const editedDocument = this.documentProcessor.processHtmlDocument(documentContext);
-    const previousDocument = DocumentManager.documentService.getPreviousDocuments();
+    const { htmlWithIds, wasModified } = this._ensureElementsHaveIds(documentContext);
 
-    const differences = deepDiff.diff(
-      HtmlProcessor.prepareDiff(previousDocument),
-      HtmlProcessor.prepareDiff(editedDocument)
-    );
-
-    if (!differences || differences.length === 0) {
+    if (wasModified) {
+      DocumentManager.documentService.updateEditorContent(htmlWithIds);
       return;
     }
 
-    const modifiedElements = this.documentProcessor.extractModifiedElements(
-      differences,
-      editedDocument
-    );
+    const editedDocumentHtml = this.documentProcessor.processHtmlDocument(documentContext);
+    const currentParagraphsMap = HtmlProcessor.createParagraphMap(editedDocumentHtml);
+    const previousParagraphsMap = DocumentManager.documentService.getPreviousDocuments();
 
-    if (modifiedElements[0] == undefined) {
-      DocumentManager.documentService.setPreviousDocuments([]);
+    const modifiedElements: string[] = [];
+    const allIds = new Set([
+      ...previousParagraphsMap.keys(),
+      ...currentParagraphsMap.keys(),
+    ]);
+
+    allIds.forEach((id) => {
+      const oldText = previousParagraphsMap.get(id);
+      const newText = currentParagraphsMap.get(id);
+
+      if (oldText === undefined && newText !== undefined) {
+        // Added
+        const elementHtml = editedDocumentHtml.find((el) => el.includes(`data-unique="${id}"`));
+        if (elementHtml) modifiedElements.push(elementHtml);
+      } else if (oldText !== undefined && newText === undefined) {
+        // Deleted
+        DocumentManager.documentService.removeErrorByTargetId(id);
+      } else if (oldText !== newText) {
+        // Modified
+        const elementHtml = editedDocumentHtml.find((el) => el.includes(`data-unique="${id}"`));
+        if (elementHtml) modifiedElements.push(elementHtml);
+      }
+    });
+
+    if (modifiedElements.length === 0) {
+      DocumentManager.documentService.setPreviousDocuments(currentParagraphsMap);
       return;
     }
 
-    console.debug("Modified Elements:", modifiedElements);
-    console.debug("CurrentDocument:", documentContext);
-    console.debug("PreviousDocument:", previousDocument);
-    console.debug("editedDocument:", editedDocument);
+    console.debug("Modified Elements for AI:", modifiedElements);
 
-    DocumentManager.documentService.setPreviousDocuments(editedDocument);
+    DocumentManager.documentService.setPreviousDocuments(currentParagraphsMap);
     await DocumentManager.documentService.handleAiRefinement(
       AiService.fetchAiRefinementsLocal(modifiedElements)
     );

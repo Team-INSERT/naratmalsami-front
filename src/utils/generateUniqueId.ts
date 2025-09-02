@@ -6,4 +6,5 @@ export enum Prefix {
   ERROR = "error-",
   PARAGRAPH_ERROR = "paragraph-error-",
   UNIQUE = "unique-",
+  PARAGRAPH = "p-",
 }

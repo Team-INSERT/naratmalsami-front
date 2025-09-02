@@ -19,7 +19,7 @@ export interface EditorRef {
  */
 export class DocumentService {
   private editorRef: EditorRef = { current: null };
-  private previousDocuments: string[] = [];
+  private previousDocuments: Map<string, string> = new Map();
   private errorParagraphsRepository: ErrorParagraphsRepository =
     new ErrorParagraphsRepository();
 
@@ -175,6 +175,10 @@ export class DocumentService {
     this.errorParagraphsRepository.deleteRefinedWordById(refine_id);
   }
 
+  public removeErrorByTargetId(targetId: string): void {
+    this.errorParagraphsRepository.removeErrorByTargetId(targetId);
+  }
+
   /**
    * @description
    * 주어진 요소(el) 바로 뒤에 붙은 조사(originJosa)를 추출해
@@ -272,9 +276,8 @@ export class DocumentService {
       ?.innerHTML as string;
     this.editorRef.current?.setData(ckEditorContentString);
     if (!isTriggingDocumentChangeEvent) {
-      this.setPreviousDocuments(
-        new HtmlProcessor().processHtmlDocument(ckEditorContentString)
-      );
+      const processedHtml = new HtmlProcessor().processHtmlDocument(ckEditorContentString);
+      this.setPreviousDocuments(HtmlProcessor.createParagraphMap(processedHtml));
     }
   }
 
@@ -287,11 +290,11 @@ export class DocumentService {
     return this.errorParagraphsRepository.subscribe(listener);
   }
 
-  public setPreviousDocuments(documents: string[]): void {
+  public setPreviousDocuments(documents: Map<string, string>): void {
     this.previousDocuments = documents;
   }
 
-  public getPreviousDocuments(): string[] {
+  public getPreviousDocuments(): Map<string, string> {
     return this.previousDocuments;
   }
 
@@ -313,5 +316,9 @@ export class DocumentService {
    */
   public getErrorByErrorId(error_id: string): ErrorDetail | undefined {
     return this.errorParagraphsRepository.getErrorByErrorId(error_id);
+  }
+
+  public updateEditorContent(html: string): void {
+    this.editorRef.current?.setData(html);
   }
 }
