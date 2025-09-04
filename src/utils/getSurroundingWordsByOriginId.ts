@@ -59,10 +59,12 @@ export default function getSurroundingWordsByOriginId(
   const after = tokens.slice(idx + 1, idx + 1 + count);
 
   if (considerJosa) {
-    // 문장 뒤에 변경해야할 조사가 존재한다면 after에서 조사 원소를 삭제
-    if (!!beforeJosa && after[0] === beforeJosa && beforeJosa !== afterJosa) {
+    // If a josa was identified and it's the first token in the 'after' array, remove it.
+    if (beforeJosa && after.length > 0 && after[0] === beforeJosa) {
       after.shift();
-    }else{
+    } else {
+      // If the next token isn't the identified josa, then our assumption was wrong.
+      // Invalidate the josa findings.
       beforeJosa = null;
       afterJosa = null;
     }
